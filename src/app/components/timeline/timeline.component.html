@@ -24,7 +24,11 @@
       </div>
 
       <!-- Date Row -->
-      <div class="date-row" [class.today]="isToday(timelineDate.dateKey)">
+      <div class="date-row"
+           [class.today]="isToday(timelineDate.dateKey)"
+           [matTooltip]="getBalanceTooltip(timelineDate.date)"
+           [matTooltipClass]="getBalanceTooltipClass(timelineDate.date)"
+           matTooltipPosition="left">
         <!-- Date Label -->
         <div class="date-label">
           {{ timelineDate.displayDate }}

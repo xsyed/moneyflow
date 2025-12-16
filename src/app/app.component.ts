@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TimelineComponent } from './components/timeline/timeline.component';
 import { EntryDialogComponent } from './components/entry-dialog/entry-dialog.component';
+import { BalanceDisplayComponent } from './components/balance-display/balance-display.component';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,8 @@ import { EntryDialogComponent } from './components/entry-dialog/entry-dialog.com
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    TimelineComponent
+    TimelineComponent,
+    BalanceDisplayComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

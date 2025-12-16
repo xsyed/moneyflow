@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { EntryService } from '../../services/entry.service';
 import { Entry } from '../../models/entry.model';
 import { generateOccurrences } from '../../utils/date.utils';
@@ -42,7 +43,8 @@ interface EntryOccurrence {
     MatIconModule,
     MatBottomSheetModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTooltipModule
   ],
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss'
@@ -372,5 +374,15 @@ export class TimelineComponent implements OnInit, AfterViewInit {
         });
       }
     });
+  }
+
+  getBalanceTooltip(date: Date): string {
+    const balance = this.entryService.getBalanceForDate(date);
+    return `Balance: ${this.entryService.formatCurrency(balance)}`;
+  }
+
+  getBalanceTooltipClass(date: Date): string {
+    const balance = this.entryService.getBalanceForDate(date);
+    return balance >= 0 ? 'positive-balance' : 'negative-balance';
   }
 }
