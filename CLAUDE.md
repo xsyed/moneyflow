@@ -24,7 +24,7 @@ A responsive web app for tracking recurring income and expenses on a visual time
 | 2 | Data Models & Services | `phase-2-models-services.md` | ✅ Complete |
 | 3 | Core Timeline UI | `phase-3-timeline-ui.md` | ✅ Complete |
 | 4 | Add Entry Feature | `phase-4-add-entry.md` | ✅ Complete |
-| 5 | Edit/Delete Features | `phase-5-edit-delete.md` | Pending |
+| 5 | Edit/Delete Features | `phase-5-edit-delete.md` | ✅ Complete |
 | 6 | Balance Calculations | `phase-6-balance.md` | Pending |
 | 7 | Initial Balance Setup | `phase-7-initial-balance.md` | Pending |
 | 8 | Polish & Responsive | `phase-8-polish.md` | Pending |

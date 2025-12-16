@@ -1,13 +1,20 @@
-import { Component, OnInit, ViewChild, AfterViewInit, signal, computed } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { EntryService } from '../../services/entry.service';
 import { Entry } from '../../models/entry.model';
 import { generateOccurrences } from '../../utils/date.utils';
+import { EntryActionsSheetComponent, EntryAction } from '../entry-actions-sheet/entry-actions-sheet.component';
+import { EntryDialogComponent } from '../entry-dialog/entry-dialog.component';
+import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { UpdateOptionsDialogComponent, UpdateOption } from '../update-options-dialog/update-options-dialog.component';
 
 interface TimelineDate {
   date: Date;
@@ -32,7 +39,10 @@ interface EntryOccurrence {
     MatListModule,
     MatDividerModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatBottomSheetModule,
+    MatDialogModule,
+    MatSnackBarModule
   ],
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss'
@@ -73,6 +83,10 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     const daysDifference = Math.abs(visibleIndex - todayIdx);
     return daysDifference > 30;
   });
+
+  private bottomSheet = inject(MatBottomSheet);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   constructor(public entryService: EntryService) {}
 
@@ -195,8 +209,26 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       }
     }
 
+    // Filter out recurring entries that have an override for this date
+    const filteredOccurrences = occurrences.filter(occurrence => {
+      // If this is a recurring entry (not 'once'), check if there's an override
+      if (occurrence.entry.repeatType !== 'once') {
+        // Look for a one-time entry with this entry's ID as parentEntryId
+        const hasOverride = occurrences.some(
+          other =>
+            other.entry.repeatType === 'once' &&
+            other.entry.parentEntryId === occurrence.entry.id &&
+            this.formatDateKey(other.date) === dateKey
+        );
+        // If there's an override for this date, exclude the recurring entry
+        return !hasOverride;
+      }
+      // Keep all one-time entries
+      return true;
+    });
+
     // Sort by amount (income first, then expenses)
-    return occurrences.sort((a, b) => {
+    return filteredOccurrences.sort((a, b) => {
       if (a.entry.type !== b.entry.type) {
         return a.entry.type === 'income' ? -1 : 1;
       }
@@ -258,5 +290,87 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
   trackByDateKey(index: number, item: TimelineDate): string {
     return item.dateKey;
+  }
+
+  onEntryClick(entry: Entry, occurrenceDate: Date): void {
+    const bottomSheetRef = this.bottomSheet.open(EntryActionsSheetComponent, {
+      data: entry
+    });
+
+    bottomSheetRef.afterDismissed().subscribe((action: EntryAction | undefined) => {
+      if (action === 'edit') {
+        this.openEditDialog(entry, occurrenceDate);
+      } else if (action === 'delete') {
+        this.openDeleteConfirmation(entry);
+      }
+    });
+  }
+
+  private openEditDialog(entry: Entry, occurrenceDate: Date): void {
+    // Check if this is a recurring entry
+    const isRecurring = entry.repeatType !== 'once';
+
+    if (isRecurring) {
+      // Show update options dialog for recurring entries
+      const optionsDialogRef = this.dialog.open(UpdateOptionsDialogComponent, {
+        width: '500px',
+        maxWidth: '90vw'
+      });
+
+      optionsDialogRef.afterClosed().subscribe((option: UpdateOption | null) => {
+        if (option) {
+          this.openEntryEditForm(entry, occurrenceDate, option);
+        }
+      });
+    } else {
+      // For one-time entries, just open the edit dialog
+      this.openEntryEditForm(entry, occurrenceDate, null);
+    }
+  }
+
+  private openEntryEditForm(entry: Entry, occurrenceDate: Date, updateOption: UpdateOption | null): void {
+    const dialogRef = this.dialog.open(EntryDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      data: {
+        entry,
+        occurrenceDate,
+        updateOption
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'updated') {
+        this.snackBar.open('Entry updated successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
+        });
+      } else if (result && result.action === 'added') {
+        this.snackBar.open('Entry created successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
+        });
+      }
+    });
+  }
+
+  private openDeleteConfirmation(entry: Entry): void {
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: '400px',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.entryService.deleteEntry(entry.id);
+        this.snackBar.open('Entry deleted successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
+        });
+      }
+    });
   }
 }

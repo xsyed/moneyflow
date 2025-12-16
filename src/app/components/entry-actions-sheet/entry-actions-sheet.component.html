@@ -1,0 +1,21 @@
+<div class="sheet-header">
+  <h3>{{ entry.label }}</h3>
+  <p class="entry-details">
+    <span [class.income]="entry.type === 'income'" [class.expense]="entry.type === 'expense'">
+      {{ entry.type === 'income' ? '+' : '-' }}${{ entry.amount.toLocaleString() }}
+    </span>
+    <span class="separator">•</span>
+    <span class="repeat-info">{{ getRepeatText() }}</span>
+  </p>
+</div>
+
+<mat-nav-list>
+  <a mat-list-item (click)="onEdit()">
+    <mat-icon matListItemIcon>edit</mat-icon>
+    <span matListItemTitle>Edit</span>
+  </a>
+  <a mat-list-item (click)="onDelete()" class="delete-action">
+    <mat-icon matListItemIcon>delete</mat-icon>
+    <span matListItemTitle>Delete</span>
+  </a>
+</mat-nav-list>

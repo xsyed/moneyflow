@@ -1,4 +1,4 @@
-export type RepeatType = 'monthly' | 'weekly' | 'biweekly';
+export type RepeatType = 'monthly' | 'weekly' | 'biweekly' | 'once';
 export type EntryType = 'income' | 'expense';
 
 export interface Entry {
@@ -6,10 +6,12 @@ export interface Entry {
   label: string;
   amount: number;
   type: EntryType;
-  dayOfMonth?: number;      // 1-31, used for monthly
-  startDate?: string;       // ISO date string, used for weekly/biweekly
-  repeatType: RepeatType;
-  createdAt: string;
+  dayOfMonth?: number;      // 1-31, used for monthly repeat
+  startDate?: string;       // ISO UTC string, used for weekly/biweekly repeat
+  repeatType: RepeatType;   // 'once' for one-time entries on specificDate
+  specificDate?: string;    // ISO UTC string, used when repeatType is 'once'
+  createdAt: string;        // ISO UTC string
+  parentEntryId?: string;   // If this is a one-time override, reference to parent recurring entry
 }
 
 export interface AppSettings {

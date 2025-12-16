@@ -7,7 +7,18 @@ export function generateOccurrences(
 ): Date[] {
   const occurrences: Date[] = [];
 
-  if (entry.repeatType === 'monthly') {
+  if (entry.repeatType === 'once') {
+    // One-time entry on a specific date
+    if (!entry.specificDate) {
+      return occurrences;
+    }
+
+    const specificDate = fromUTC(new Date(entry.specificDate));
+
+    if (specificDate >= startDate && specificDate <= endDate) {
+      occurrences.push(specificDate);
+    }
+  } else if (entry.repeatType === 'monthly') {
     if (entry.dayOfMonth === undefined) {
       return occurrences;
     }
@@ -30,7 +41,8 @@ export function generateOccurrences(
       return occurrences;
     }
 
-    const entryStartDate = new Date(entry.startDate);
+    // Convert UTC startDate to local timezone
+    const entryStartDate = fromUTC(new Date(entry.startDate));
     const intervalDays = entry.repeatType === 'weekly' ? 7 : 14;
 
     let currentDate = new Date(entryStartDate);
@@ -49,7 +61,13 @@ export function generateOccurrences(
 }
 
 export function getNextOccurrence(entry: Entry, fromDate: Date): Date {
-  if (entry.repeatType === 'monthly') {
+  if (entry.repeatType === 'once') {
+    // One-time entries don't have a "next" occurrence
+    if (!entry.specificDate) {
+      return fromDate;
+    }
+    return fromUTC(new Date(entry.specificDate));
+  } else if (entry.repeatType === 'monthly') {
     if (entry.dayOfMonth === undefined) {
       return fromDate;
     }
@@ -68,7 +86,8 @@ export function getNextOccurrence(entry: Entry, fromDate: Date): Date {
       return fromDate;
     }
 
-    const entryStartDate = new Date(entry.startDate);
+    // Convert UTC startDate to local timezone
+    const entryStartDate = fromUTC(new Date(entry.startDate));
     const intervalDays = entry.repeatType === 'weekly' ? 7 : 14;
 
     let nextDate = new Date(entryStartDate);
@@ -95,4 +114,30 @@ export function formatDateForDisplay(date: Date): string {
 
 function getDaysInMonth(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+}
+
+/**
+ * Convert UTC date to local timezone
+ * Takes a UTC Date object and returns a Date in the user's local timezone
+ */
+export function fromUTC(utcDate: Date): Date {
+  return new Date(
+    utcDate.getUTCFullYear(),
+    utcDate.getUTCMonth(),
+    utcDate.getUTCDate(),
+    0, 0, 0, 0
+  );
+}
+
+/**
+ * Convert local date to UTC
+ * Takes a local Date and returns a UTC Date object
+ */
+export function toUTC(localDate: Date): Date {
+  return new Date(Date.UTC(
+    localDate.getFullYear(),
+    localDate.getMonth(),
+    localDate.getDate(),
+    0, 0, 0, 0
+  ));
 }

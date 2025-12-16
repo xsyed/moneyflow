@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Update Recurring Entry</h2>
+
+<mat-dialog-content>
+  <p class="dialog-message">
+    This is a recurring entry. How would you like to update it?
+  </p>
+
+  <div class="options-container">
+    <button mat-raised-button class="option-button" (click)="onThisOnly()">
+      <div class="option-content">
+        <mat-icon>event</mat-icon>
+        <div class="option-text">
+          <div class="option-title">This occurrence only</div>
+          <div class="option-description">Changes will apply only to this date</div>
+        </div>
+      </div>
+    </button>
+
+    <button mat-raised-button color="primary" class="option-button" (click)="onAllFuture()">
+      <div class="option-content">
+        <mat-icon>event_repeat</mat-icon>
+        <div class="option-text">
+          <div class="option-title">This and all future occurrences</div>
+          <div class="option-description">Changes will apply to this and all upcoming dates</div>
+        </div>
+      </div>
+    </button>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

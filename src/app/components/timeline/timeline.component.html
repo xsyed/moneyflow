@@ -42,7 +42,8 @@
             <div *ngFor="let occurrence of timelineDate.entries; let last = last"
                  class="entry-item"
                  [class.income]="occurrence.entry.type === 'income'"
-                 [class.expense]="occurrence.entry.type === 'expense'">
+                 [class.expense]="occurrence.entry.type === 'expense'"
+                 (click)="onEntryClick(occurrence.entry, occurrence.date)">
 
               <div class="entry-connector">──</div>
               <div class="entry-label">{{ occurrence.entry.label }}</div>

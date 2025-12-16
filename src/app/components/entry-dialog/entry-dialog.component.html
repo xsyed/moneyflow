@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Add Entry</h2>
+<h2 mat-dialog-title>{{ isEditMode() ? 'Edit Entry' : 'Add Entry' }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="entryForm" class="entry-form">
@@ -84,6 +84,6 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
   <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!isFormValid">
-    Save
+    {{ isEditMode() ? 'Update' : 'Save' }}
   </button>
 </mat-dialog-actions>
