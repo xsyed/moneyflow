@@ -1,0 +1,63 @@
+<div class="timeline-container">
+  <!-- Scroll to Today Button -->
+  <button
+    mat-fab
+    class="today-button"
+    (click)="scrollToToday()"
+    aria-label="Scroll to today">
+    <mat-icon>today</mat-icon>
+  </button>
+
+  <!-- Virtual Scroll Viewport -->
+  <cdk-virtual-scroll-viewport
+    itemSize="60"
+    class="timeline-viewport"
+    (scrolledIndexChange)="onScroll()">
+
+    <div *cdkVirtualFor="let timelineDate of timelineDates(); trackBy: trackByDateKey"
+         class="timeline-item">
+
+      <!-- Month Header -->
+      <div *ngIf="timelineDate.isMonthStart" class="month-header">
+        {{ timelineDate.monthYear }}
+      </div>
+
+      <!-- Date Row -->
+      <div class="date-row" [class.today]="isToday(timelineDate.dateKey)">
+        <!-- Date Label -->
+        <div class="date-label">
+          {{ timelineDate.displayDate }}
+        </div>
+
+        <!-- Connector Column -->
+        <div class="connector-column">
+          <div class="connector-line"></div>
+        </div>
+
+        <!-- Entries Column -->
+        <div class="entries-column">
+          <!-- Show entries if any exist -->
+          <div *ngIf="timelineDate.entries.length > 0" class="entries-list">
+            <div *ngFor="let occurrence of timelineDate.entries; let last = last"
+                 class="entry-item"
+                 [class.income]="occurrence.entry.type === 'income'"
+                 [class.expense]="occurrence.entry.type === 'expense'">
+
+              <div class="entry-connector">──</div>
+              <div class="entry-label">{{ occurrence.entry.label }}</div>
+              <div class="entry-amount">
+                {{ formatAmount(occurrence.entry) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Show empty state if no entries -->
+          <div *ngIf="timelineDate.entries.length === 0" class="no-entries">
+            <div class="empty-connector">│</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </cdk-virtual-scroll-viewport>
+</div>
