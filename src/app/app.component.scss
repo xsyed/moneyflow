@@ -1,0 +1,16 @@
+main {
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.fab-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+
+  @media (max-width: 600px) {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}

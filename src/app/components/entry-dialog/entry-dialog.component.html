@@ -1,0 +1,89 @@
+<h2 mat-dialog-title>Add Entry</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="entryForm" class="entry-form">
+
+    <!-- Label Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Label</mat-label>
+      <input matInput formControlName="label" placeholder="e.g., Salary, Rent" required>
+      <mat-error *ngIf="entryForm.get('label')?.hasError('required')">
+        Label is required
+      </mat-error>
+      <mat-error *ngIf="entryForm.get('label')?.hasError('minlength')">
+        Label must be at least 1 character
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Amount Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Amount</mat-label>
+      <input matInput type="number" formControlName="amount" placeholder="0.00" required step="0.01" min="0">
+      <span matTextPrefix>$&nbsp;</span>
+      <mat-error *ngIf="entryForm.get('amount')?.hasError('required')">
+        Amount is required
+      </mat-error>
+      <mat-error *ngIf="entryForm.get('amount')?.hasError('min')">
+        Amount must be greater than 0
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Type Toggle -->
+    <div class="form-field-wrapper">
+      <label class="field-label">Type</label>
+      <mat-button-toggle-group formControlName="type" class="full-width">
+        <mat-button-toggle value="income">Income</mat-button-toggle>
+        <mat-button-toggle value="expense">Expense</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <!-- Repeat Type Select -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Repeat</mat-label>
+      <mat-select formControlName="repeatType" required>
+        <mat-option value="monthly">Monthly</mat-option>
+        <mat-option value="weekly">Weekly</mat-option>
+        <mat-option value="biweekly">Biweekly</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Conditional Day/Date Selection -->
+
+    <!-- Day of Month (for Monthly) -->
+    <mat-form-field
+      *ngIf="repeatType() === 'monthly'"
+      appearance="outline"
+      class="full-width">
+      <mat-label>Day of Month</mat-label>
+      <mat-select formControlName="dayOfMonth" required>
+        <mat-option *ngFor="let day of days" [value]="day">
+          {{ day }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>Day when this entry occurs each month</mat-hint>
+    </mat-form-field>
+
+    <!-- Start Date (for Weekly/Biweekly) -->
+    <mat-form-field
+      *ngIf="repeatType() === 'weekly' || repeatType() === 'biweekly'"
+      appearance="outline"
+      class="full-width">
+      <mat-label>Start Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="startDate" required>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-hint>First occurrence date</mat-hint>
+      <mat-error *ngIf="entryForm.get('startDate')?.hasError('required')">
+        Start date is required
+      </mat-error>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!isFormValid">
+    Save
+  </button>
+</mat-dialog-actions>

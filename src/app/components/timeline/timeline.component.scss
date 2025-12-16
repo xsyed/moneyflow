@@ -7,8 +7,8 @@
 
 .today-button {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 6.5rem; // Position above the Add Entry FAB (2rem base + 56px FAB + 1rem spacing)
+  right: 2rem;
   z-index: 10;
   background-color: #1976d2;
   color: white;
@@ -212,8 +212,8 @@
   }
 
   .today-button {
-    bottom: 16px;
-    right: 16px;
+    bottom: 5rem; // Position above the Add Entry FAB on mobile (1rem base + ~50px scaled FAB + spacing)
+    right: 1rem;
     transform: scale(0.9);
   }
 }

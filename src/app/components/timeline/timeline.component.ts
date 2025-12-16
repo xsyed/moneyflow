@@ -59,6 +59,21 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     return dates.findIndex(d => d.dateKey === todayKey);
   });
 
+  // Track the current visible date range
+  private currentVisibleIndex = signal<number>(0);
+
+  // Show "Scroll to Today" button only if we're more than 1 month away from today
+  showScrollToToday = computed(() => {
+    const visibleIndex = this.currentVisibleIndex();
+    const todayIdx = this.todayIndex();
+
+    if (todayIdx < 0) return false; // Today not in range
+
+    // Calculate difference in days (approximate 30 days = 1 month)
+    const daysDifference = Math.abs(visibleIndex - todayIdx);
+    return daysDifference > 30;
+  });
+
   constructor(public entryService: EntryService) {}
 
   ngOnInit(): void {
@@ -69,6 +84,11 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     // Scroll to today after view is initialized
     setTimeout(() => {
       this.scrollToToday();
+      // Set initial visible index
+      const todayIdx = this.todayIndex();
+      if (todayIdx >= 0) {
+        this.currentVisibleIndex.set(todayIdx);
+      }
     }, 100);
   }
 
@@ -84,6 +104,9 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
     const scrollIndex = this.viewport.getRenderedRange().start;
     const totalItems = this.timelineDates().length;
+
+    // Update current visible index for "Scroll to Today" button visibility
+    this.currentVisibleIndex.set(scrollIndex);
 
     // Load more past dates if scrolling near the top (within 30 items)
     if (scrollIndex < 30) {
