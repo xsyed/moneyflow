@@ -26,7 +26,7 @@ A responsive web app for tracking recurring income and expenses on a visual time
 | 4 | Add Entry Feature | `phase-4-add-entry.md` | ✅ Complete |
 | 5 | Edit/Delete Features | `phase-5-edit-delete.md` | ✅ Complete |
 | 6 | Balance Calculations | `phase-6-balance.md` | ✅ Complete |
-| 7 | Initial Balance Setup | `phase-7-initial-balance.md` | Pending |
+| 7 | Initial Balance Setup | `phase-7-initial-balance.md` | ✅ Complete |
 | 8 | Polish & Responsive | `phase-8-polish.md` | Pending |
 
 ## Project Structure (Target)

@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Welcome to Income Flow!</h2>
+
+<mat-dialog-content>
+  <p class="welcome-message">
+    Track your recurring income and expenses with ease.
+    Let's start by setting your current balance.
+  </p>
+
+  <form [formGroup]="balanceForm" class="balance-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Current Balance</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="initialBalance"
+        placeholder="0.00"
+        required
+        step="0.01"
+        min="0"
+        autofocus>
+      <span matTextPrefix>$&nbsp;</span>
+      <mat-error *ngIf="balanceForm.get('initialBalance')?.hasError('required')">
+        Balance is required
+      </mat-error>
+      <mat-error *ngIf="balanceForm.get('initialBalance')?.hasError('min')">
+        Balance must be at least $0.01
+      </mat-error>
+      <mat-hint>This is your starting point for all calculations</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="!isFormValid">
+    Get Started
+  </button>
+</mat-dialog-actions>

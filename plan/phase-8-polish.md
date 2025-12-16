@@ -5,6 +5,8 @@ Final UI refinements, ensure responsive design, and overall polish.
 
 ## Steps
 
+1. There is problem with modal styling basically for delete modal the actions button spacing is off. Also for the Single occurence edit modal has the same problem. Fix it.
+
 ### 8.1 Responsive Layout
 Test and adjust for:
 - Mobile (320px - 480px)
@@ -73,3 +75,5 @@ Ensure all imports are in `app.config.ts`:
 - [ ] Empty state handling
 - [ ] Accessibility basics
 - [ ] Manual testing complete
+
+

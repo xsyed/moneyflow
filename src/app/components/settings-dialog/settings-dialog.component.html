@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Settings</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="settingsForm" class="settings-form">
+
+    <!-- Initial Balance Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Initial Balance</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="initialBalance"
+        placeholder="0.00"
+        required
+        step="0.01"
+        min="0">
+      <span matTextPrefix>$&nbsp;</span>
+      <mat-error *ngIf="settingsForm.get('initialBalance')?.hasError('required')">
+        Initial balance is required
+      </mat-error>
+      <mat-error *ngIf="settingsForm.get('initialBalance')?.hasError('min')">
+        Balance must be at least $0.01
+      </mat-error>
+      <mat-hint>Your starting balance for calculations</mat-hint>
+    </mat-form-field>
+
+    <!-- Balance Set Date Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Balance Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="balanceSetDate"
+        required>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="settingsForm.get('balanceSetDate')?.hasError('required')">
+        Balance date is required
+      </mat-error>
+      <mat-hint>The date this balance applies from</mat-hint>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="!isFormValid">
+    Save
+  </button>
+</mat-dialog-actions>

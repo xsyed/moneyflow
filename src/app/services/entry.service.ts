@@ -63,6 +63,11 @@ export class EntryService {
     this.storageService.saveSettings(newSettings);
   }
 
+  updateSettings(settings: AppSettings): void {
+    this.settings.set(settings);
+    this.storageService.saveSettings(settings);
+  }
+
   private generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }

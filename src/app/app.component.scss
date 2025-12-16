@@ -3,6 +3,10 @@ main {
   overflow: hidden;
 }
 
+.spacer {
+  flex: 1 1 auto;
+}
+
 .fab-button {
   position: fixed;
   bottom: 2rem;
