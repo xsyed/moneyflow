@@ -1,0 +1,50 @@
+.dialog-message {
+  margin-bottom: 1.5rem;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.option-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.option-button {
+  width: 100%;
+  padding: 1rem;
+  text-align: left;
+  background: white;
+  border: 2px solid #e0e0e0;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: #1976d2;
+  }
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.option-text {
+  flex: 1;
+}
+
+.option-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.option-description {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+mat-icon {
+  color: #1976d2;
+  font-size: 24px;
+}

@@ -18,11 +18,6 @@
     <div *cdkVirtualFor="let timelineDate of timelineDates(); trackBy: trackByDateKey"
          class="timeline-item">
 
-      <!-- Month Header -->
-      <div *ngIf="timelineDate.isMonthStart" class="month-header">
-        {{ timelineDate.monthYear }}
-      </div>
-
       <!-- Date Row -->
       <div class="date-row"
            [class.today]="isToday(timelineDate.dateKey)"
@@ -62,6 +57,23 @@
             <div class="empty-connector">│</div>
           </div>
         </div>
+      </div>
+
+      <!-- Month-End Balance Row -->
+      <div *ngIf="timelineDate.isMonthEnd" class="month-end-balance-row">
+        <div class="month-end-label">
+          Balance as of {{ formatMonthEndDate(timelineDate.date) }}
+        </div>
+        <div class="month-end-amount"
+             [class.positive]="getBalanceForDate(timelineDate.date) >= 0"
+             [class.negative]="getBalanceForDate(timelineDate.date) < 0">
+          {{ formatCurrency(getBalanceForDate(timelineDate.date)) }}
+        </div>
+      </div>
+
+      <!-- Month Header (shown after month-end balance) -->
+      <div *ngIf="timelineDate.isMonthEnd" class="month-header">
+        {{ timelineDate.nextMonthYear }}
       </div>
     </div>
 

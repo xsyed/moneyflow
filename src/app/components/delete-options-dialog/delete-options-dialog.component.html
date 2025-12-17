@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Delete Recurring Entry</h2>
+
+<mat-dialog-content>
+  <p class="dialog-message">This is a recurring entry. What would you like to delete?</p>
+
+  <div class="option-container">
+    <button mat-raised-button class="option-button" (click)="onThisOnly()">
+      <div class="option-content">
+        <mat-icon>event</mat-icon>
+        <div class="option-text">
+          <div class="option-title">Delete this occurrence only</div>
+          <div class="option-description">Only this date will be removed</div>
+        </div>
+      </div>
+    </button>
+
+    <button mat-raised-button class="option-button" (click)="onAllOccurrences()">
+      <div class="option-content">
+        <mat-icon>delete_forever</mat-icon>
+        <div class="option-text">
+          <div class="option-title">Delete all occurrences</div>
+          <div class="option-description">Completely remove this recurring entry</div>
+        </div>
+      </div>
+    </button>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+</mat-dialog-actions>

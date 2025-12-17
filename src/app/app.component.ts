@@ -25,7 +25,7 @@ import { EntryService } from './services/entry.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  title = 'Income Flow';
+  title = 'Money Stream';
   private dialog = inject(MatDialog);
   private entryService = inject(EntryService);
 
@@ -37,10 +37,17 @@ export class AppComponent implements OnInit {
   }
 
   private openInitialBalanceDialog(): void {
-    this.dialog.open(InitialBalanceDialogComponent, {
+    const dialogRef = this.dialog.open(InitialBalanceDialogComponent, {
       width: '400px',
       maxWidth: '90vw',
       disableClose: true  // User MUST set initial balance
+    });
+
+    // Ensure timeline re-initializes after balance is set
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Balance was set - timeline will auto-update via computed signals
+      }
     });
   }
 

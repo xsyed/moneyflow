@@ -1,7 +1,7 @@
 .timeline-container {
   position: relative;
   height: calc(100vh - 64px - 40px); // Full height minus toolbar and padding
-  max-width: 900px;
+  max-width: min(75%, 1600px);
   margin: 0 auto;
 }
 
@@ -35,6 +35,7 @@
   top: 0;
   background-color: #f5f5f5;
   padding: 12px 20px;
+  margin-top: 8px;
   font-weight: 600;
   font-size: 16px;
   color: #424242;
@@ -68,12 +69,12 @@
 
 .date-label {
   min-width: 70px;
-  font-size: 14px;
-  color: #616161;
+  font-size: 16px;
+  color: #424242;
   display: flex;
   align-items: flex-start;
   padding-top: 4px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .connector-column {
@@ -173,10 +174,45 @@
   font-weight: 100;
 }
 
+.month-end-balance-row {
+  background: linear-gradient(to right, #f5f5f5, #fafafa);
+  border-top: 2px solid #e0e0e0;
+  border-bottom: 2px solid #e0e0e0;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.month-end-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #616161;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.month-end-amount {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Roboto Mono', monospace;
+
+  &.positive {
+    color: #2e7d32;
+  }
+
+  &.negative {
+    color: #c62828;
+  }
+}
+
 // Responsive styles for mobile
 @media (max-width: 768px) {
   .timeline-container {
     height: calc(100vh - 56px - 20px); // Smaller toolbar on mobile
+    max-width: 100%;
   }
 
   .month-header {
@@ -191,7 +227,8 @@
 
   .date-label {
     min-width: 60px;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 700;
   }
 
   .connector-column {
@@ -217,13 +254,26 @@
     right: 1rem;
     transform: scale(0.9);
   }
+
+  .month-end-balance-row {
+    padding: 12px 16px;
+  }
+
+  .month-end-label {
+    font-size: 12px;
+  }
+
+  .month-end-amount {
+    font-size: 16px;
+  }
 }
 
 // Small mobile screens
 @media (max-width: 480px) {
   .date-label {
     min-width: 55px;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 700;
   }
 
   .entry-connector {

@@ -53,6 +53,26 @@ export class EntryService {
     this.storageService.saveEntries(updatedEntries);
   }
 
+  deleteSingleOccurrence(entryId: string, occurrenceDate: Date): void {
+    const entry = this.entries().find(e => e.id === entryId);
+    if (!entry) return;
+
+    // Create deletion marker
+    const deletionMarker: Entry = {
+      id: this.generateId(),
+      label: entry.label,
+      amount: 0,
+      type: entry.type,
+      repeatType: 'once',
+      specificDate: occurrenceDate.toISOString(),
+      createdAt: new Date().toISOString(),
+      parentEntryId: entryId,
+      isDeleted: true
+    };
+
+    this.addEntry(deletionMarker);
+  }
+
   setInitialBalance(amount: number): void {
     const newSettings: AppSettings = {
       initialBalance: amount,

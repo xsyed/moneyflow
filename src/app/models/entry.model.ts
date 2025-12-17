@@ -12,6 +12,7 @@ export interface Entry {
   specificDate?: string;    // ISO UTC string, used when repeatType is 'once'
   createdAt: string;        // ISO UTC string
   parentEntryId?: string;   // If this is a one-time override, reference to parent recurring entry
+  isDeleted?: boolean;      // Marks this as a deletion marker for recurring entry
 }
 
 export interface AppSettings {

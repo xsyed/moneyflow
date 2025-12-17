@@ -1,17 +1,8 @@
-<div class="balance-card"
-     [class.positive]="isPositive()"
-     [class.negative]="isNegative()">
-  <div class="balance-header">
-    <mat-icon class="balance-icon">account_balance_wallet</mat-icon>
-    <span class="balance-label">Current Balance</span>
-  </div>
-
-  <div *ngIf="hasInitialBalance()" class="balance-amount">
+<div *ngIf="hasInitialBalance()" class="balance-inline">
+  <mat-icon class="balance-icon">account_balance_wallet</mat-icon>
+  <span class="balance-amount"
+        [class.positive]="isPositive()"
+        [class.negative]="isNegative()">
     {{ formattedBalance() }}
-  </div>
-
-  <div *ngIf="!hasInitialBalance()" class="no-balance-warning">
-    <mat-icon>warning</mat-icon>
-    <span>Set initial balance</span>
-  </div>
+  </span>
 </div>

@@ -15,6 +15,7 @@ import { generateOccurrences } from '../../utils/date.utils';
 import { EntryActionsSheetComponent, EntryAction } from '../entry-actions-sheet/entry-actions-sheet.component';
 import { EntryDialogComponent } from '../entry-dialog/entry-dialog.component';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { DeleteOptionsDialogComponent, DeleteOption } from '../delete-options-dialog/delete-options-dialog.component';
 import { UpdateOptionsDialogComponent, UpdateOption } from '../update-options-dialog/update-options-dialog.component';
 
 interface TimelineDate {
@@ -22,7 +23,9 @@ interface TimelineDate {
   dateKey: string; // YYYY-MM-DD for comparison
   displayDate: string; // "10 Dec"
   isMonthStart: boolean;
+  isMonthEnd: boolean;
   monthYear: string; // "December 2024" for headers
+  nextMonthYear: string; // "January 2025" for next month header
   entries: EntryOccurrence[];
 }
 
@@ -168,6 +171,14 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       const isMonthStart = currentMonth !== previousMonth;
       const monthYear = this.formatMonthYear(currentDate);
 
+      // Check if this is the last day of the month
+      const nextDay = new Date(currentDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const isMonthEnd = nextDay.getMonth() !== currentMonth;
+
+      // Calculate next month year for header
+      const nextMonthYear = this.formatMonthYear(nextDay);
+
       // Find all entries that occur on this date
       const entriesForDate = this.getEntriesForDate(currentDate, entries);
 
@@ -176,7 +187,9 @@ export class TimelineComponent implements OnInit, AfterViewInit {
         dateKey,
         displayDate,
         isMonthStart,
+        isMonthEnd,
         monthYear,
+        nextMonthYear,
         entries: entriesForDate
       });
 
@@ -213,19 +226,31 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
     // Filter out recurring entries that have an override for this date
     const filteredOccurrences = occurrences.filter(occurrence => {
-      // If this is a recurring entry (not 'once'), check if there's an override
+      // Skip deletion markers themselves
+      if (occurrence.entry.isDeleted) return false;
+
+      // For recurring entries, check if deleted
       if (occurrence.entry.repeatType !== 'once') {
+        // Check for deletion marker
+        const hasDeleteMarker = entries.some(
+          e => e.isDeleted === true &&
+               e.parentEntryId === occurrence.entry.id &&
+               e.specificDate === dateKey
+        );
+        if (hasDeleteMarker) return false;
+
         // Look for a one-time entry with this entry's ID as parentEntryId
         const hasOverride = occurrences.some(
           other =>
             other.entry.repeatType === 'once' &&
+            !other.entry.isDeleted &&
             other.entry.parentEntryId === occurrence.entry.id &&
             this.formatDateKey(other.date) === dateKey
         );
         // If there's an override for this date, exclude the recurring entry
         return !hasOverride;
       }
-      // Keep all one-time entries
+      // Keep all one-time entries (except deletion markers, already filtered above)
       return true;
     });
 
@@ -253,6 +278,22 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
   private formatMonthYear(date: Date): string {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
+
+  formatMonthEndDate(date: Date): string {
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+
+  getBalanceForDate(date: Date): number {
+    return this.entryService.getBalanceForDate(date);
+  }
+
+  formatCurrency(amount: number): string {
+    return this.entryService.formatCurrency(amount);
   }
 
   private getDateMonthsAgo(months: number): Date {
@@ -303,7 +344,7 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       if (action === 'edit') {
         this.openEditDialog(entry, occurrenceDate);
       } else if (action === 'delete') {
-        this.openDeleteConfirmation(entry);
+        this.openDeleteConfirmation(entry, occurrenceDate);
       }
     });
   }
@@ -358,7 +399,35 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private openDeleteConfirmation(entry: Entry): void {
+  private openDeleteConfirmation(entry: Entry, occurrenceDate: Date): void {
+    const isRecurring = entry.repeatType !== 'once';
+
+    if (isRecurring) {
+      // Show delete options dialog for recurring entries
+      const optionsDialogRef = this.dialog.open(DeleteOptionsDialogComponent, {
+        width: '500px',
+        maxWidth: '90vw'
+      });
+
+      optionsDialogRef.afterClosed().subscribe((option: DeleteOption | null) => {
+        if (option === 'this-only') {
+          this.entryService.deleteSingleOccurrence(entry.id, occurrenceDate);
+          this.snackBar.open('Occurrence deleted successfully', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom'
+          });
+        } else if (option === 'all-occurrences') {
+          this.deleteAllOccurrences(entry);
+        }
+      });
+    } else {
+      // One-time entry - show simple confirmation
+      this.deleteAllOccurrences(entry);
+    }
+  }
+
+  private deleteAllOccurrences(entry: Entry): void {
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
       width: '400px',
       maxWidth: '90vw'
