@@ -90,34 +90,6 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     return dates.findIndex(d => d.dateKey === todayKey);
   });
 
-  // Compute average item size dynamically based on actual content
-  estimateAverageItemSize = computed(() => {
-    const dates = this.timelineDates();
-    if (dates.length === 0) return 60;
-
-    const totalEstimated = dates.reduce((sum, date) => {
-      let size = 60; // Base date row height
-
-      // Add skip indicator height if present
-      if (date.daysSkipped && date.daysSkipped > 0) {
-        size += 24;
-      }
-
-      // Add height for each entry (~40px per entry)
-      size += date.entries.length * 40;
-
-      // Add height for month-end balance and header
-      if (date.isMonthEnd) {
-        size += 60; // month-end balance row
-        size += 50; // month header
-      }
-
-      return sum + size;
-    }, 0);
-
-    return Math.round(totalEstimated / dates.length);
-  });
-
   // Track the current visible date range
   private currentVisibleIndex = signal<number>(0);
 

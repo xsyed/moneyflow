@@ -11,7 +11,9 @@
 
   <!-- Virtual Scroll Viewport -->
   <cdk-virtual-scroll-viewport
-    [itemSize]="estimateAverageItemSize()"
+    itemSize="100"
+    minBufferPx="800"
+    maxBufferPx="1200"
     class="timeline-viewport"
     (scrolledIndexChange)="onScroll()">
 
