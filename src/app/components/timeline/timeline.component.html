@@ -11,7 +11,7 @@
 
   <!-- Virtual Scroll Viewport -->
   <cdk-virtual-scroll-viewport
-    itemSize="60"
+    [itemSize]="estimateAverageItemSize()"
     class="timeline-viewport"
     (scrolledIndexChange)="onScroll()">
 
@@ -28,9 +28,9 @@
 
       <!-- Date Row -->
       <div class="date-row"
-           [class.today]="isToday(timelineDate.dateKey)"
-           [matTooltip]="getBalanceTooltip(timelineDate.date)"
-           [matTooltipClass]="getBalanceTooltipClass(timelineDate.date)"
+           [class.today]="timelineDate.isToday"
+           [matTooltip]="isMobile() ? '' : timelineDate.balanceTooltip"
+           [matTooltipClass]="timelineDate.balanceTooltipClass"
            matTooltipPosition="left"
            [matTooltipShowDelay]="300"
            [matTooltipHideDelay]="0"
@@ -60,7 +60,7 @@
                 <div *ngIf="occurrence.entry.note" class="entry-note">{{ occurrence.entry.note }}</div>
               </div>
               <div class="entry-amount">
-                {{ formatAmount(occurrence.entry) }}
+                {{ occurrence.amountFormatted }}
               </div>
             </div>
           </div>
@@ -75,19 +75,19 @@
       <!-- Month-End Balance Row -->
       <div *ngIf="timelineDate.isMonthEnd" class="month-end-balance-row">
         <div class="month-end-label">
-          Balance as of {{ formatMonthEndDate(timelineDate.date) }}
+          Balance as of {{ timelineDate.monthEndDateFormatted }}
         </div>
         <div class="month-end-amount"
-             [class.positive]="getBalanceForDate(timelineDate.date) >= 0"
-             [class.negative]="getBalanceForDate(timelineDate.date) < 0">
-          {{ formatCurrency(getBalanceForDate(timelineDate.date)) }}
+             [class.positive]="timelineDate.balance >= 0"
+             [class.negative]="timelineDate.balance < 0">
+          {{ timelineDate.balanceFormatted }}
         </div>
       </div>
 
       <!-- Month Header (shown after month-end balance) -->
       <div *ngIf="timelineDate.isMonthEnd"
            class="month-header"
-           [class.current-month]="isCurrentMonth(timelineDate.date)">
+           [class.current-month]="timelineDate.isCurrentMonth">
         {{ timelineDate.nextMonthYear }}
       </div>
 
