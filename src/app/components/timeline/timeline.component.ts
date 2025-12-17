@@ -153,10 +153,13 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Scroll to today after view is initialized
+    // Setup observers immediately
     setTimeout(() => {
-      this.scrollToToday();
       this.setupIntersectionObservers();
+      // Delay scroll to ensure content is fully rendered
+      setTimeout(() => {
+        this.scrollToToday();
+      }, 500);
     }, 100);
   }
 
@@ -171,7 +174,18 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       const container = this.scrollContainer.nativeElement;
       const items = container.querySelectorAll('.timeline-item');
       if (items[index]) {
-        items[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const itemElement = items[index] as HTMLElement;
+        const containerRect = container.getBoundingClientRect();
+        const itemRect = itemElement.getBoundingClientRect();
+
+        // Calculate the scroll position to center the item in the viewport
+        const scrollOffset = itemElement.offsetTop - (container.clientHeight / 2) + (itemRect.height / 2);
+
+        // Scroll within the container only
+        container.scrollTo({
+          top: scrollOffset,
+          behavior: 'smooth'
+        });
       }
     }
   }
@@ -198,7 +212,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   private setupIntersectionObservers(): void {
     const options: IntersectionObserverInit = {
       root: this.scrollContainer.nativeElement,
-      rootMargin: '200px',
+      rootMargin: '100px',
       threshold: 0
     };
 
@@ -207,7 +221,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       if (entries[0].isIntersecting && !this.loadingMore) {
         this.loadingMore = true;
         this.loadMorePast();
-        setTimeout(() => this.loadingMore = false, 100);
+        setTimeout(() => this.loadingMore = false, 200);
       }
     }, options);
     this.topObserver.observe(this.topSentinel.nativeElement);
@@ -217,7 +231,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       if (entries[0].isIntersecting && !this.loadingMore) {
         this.loadingMore = true;
         this.loadMoreFuture();
-        setTimeout(() => this.loadingMore = false, 100);
+        setTimeout(() => this.loadingMore = false, 200);
       }
     }, options);
     this.bottomObserver.observe(this.bottomSentinel.nativeElement);
