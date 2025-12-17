@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, signal, computed, inject, ChangeDetectionStrategy, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { MatListModule } from '@angular/material/list';
@@ -74,6 +74,10 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   private startDate = signal<Date>(this.getDateMonthsAgo(6));
   private endDate = signal<Date>(this.getDateMonthsAhead(6));
 
+  // Stable core range (doesn't shift with time)
+  private coreStartDate = signal<Date>(this.getDateMonthsAgo(6));
+  private coreEndDate = signal<Date>(this.getDateMonthsAhead(6));
+
   // Cached timeline segments for incremental generation
   private pastDates = signal<TimelineDate[]>([]);
   private coreDates = signal<TimelineDate[]>([]);
@@ -96,6 +100,9 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   // Mobile detection for performance optimizations
   isMobile = signal<boolean>(false);
 
+  // Flag to track initialization (plain boolean to avoid signal tracking in effect)
+  private initialized = false;
+
   // Show "Scroll to Today" button only if we're more than 1 month away from today
   showScrollToToday = computed(() => {
     const visibleIndex = this.currentVisibleIndex();
@@ -111,22 +118,33 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   private bottomSheet = inject(MatBottomSheet);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(public entryService: EntryService) {
     // Watch for entry changes and regenerate all segments
     effect(() => {
+      // Track entries signal - this makes the effect reactive
       const entries = this.entryService.entries();
-      // Trigger regeneration when entries change
-      this.regenerateAllSegments();
-    });
+      // Only regenerate if already initialized (use plain boolean to avoid infinite loop)
+      if (this.initialized) {
+        this.regenerateAllSegments();
+      }
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
     // Detect mobile for performance optimizations
     this.isMobile.set(window.innerWidth <= 768);
 
+    // Set stable core range (doesn't shift with time)
+    this.coreStartDate.set(this.getDateMonthsAgo(6));
+    this.coreEndDate.set(this.getDateMonthsAhead(6));
+
     // Initialize core timeline (today ±6 months)
     this.initializeCoreTimeline();
+
+    // Mark as initialized so the effect can start regenerating on entry changes
+    this.initialized = true;
   }
 
   ngAfterViewInit(): void {
@@ -187,16 +205,16 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     const end = this.endDate();
     const entries = this.entryService.entries();
 
-    // Split into segments
-    const coreStart = this.getDateMonthsAgo(6);
-    const coreEnd = this.getDateMonthsAhead(6);
+    // Use STABLE core range (doesn't shift with time)
+    const coreStart = this.coreStartDate();
+    const coreEnd = this.coreEndDate();
 
     // Generate past segment (if start is before core)
     const pastDates = start < coreStart
       ? this.generateTimelineDates(start, coreStart, entries)
       : [];
 
-    // Generate core segment (today ±6 months)
+    // Generate core segment (stable ±6 months range)
     const coreDates = this.generateTimelineDates(coreStart, coreEnd, entries);
 
     // Generate future segment (if end is after core)
@@ -207,6 +225,9 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     this.pastDates.set(pastDates);
     this.coreDates.set(coreDates);
     this.futureDates.set(futureDates);
+
+    // CRITICAL: Trigger change detection for OnPush
+    this.cdr.markForCheck();
   }
 
   private loadMorePast(): void {
@@ -509,6 +530,9 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.action === 'added') {
+        // Regenerate timeline after adding entry
+        this.regenerateAllSegments();
+
         this.snackBar.open('Entry created successfully', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
@@ -570,12 +594,18 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.action === 'updated') {
+        // Regenerate timeline after updating entry
+        this.regenerateAllSegments();
+
         this.snackBar.open('Entry updated successfully', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom'
         });
       } else if (result && result.action === 'added') {
+        // Regenerate timeline after adding override entry
+        this.regenerateAllSegments();
+
         this.snackBar.open('Entry created successfully', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
@@ -598,6 +628,10 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       optionsDialogRef.afterClosed().subscribe((option: DeleteOption | null) => {
         if (option === 'this-only') {
           this.entryService.deleteSingleOccurrence(entry.id, occurrenceDate);
+
+          // Regenerate timeline after deleting single occurrence
+          this.regenerateAllSegments();
+
           this.snackBar.open('Occurrence deleted successfully', 'Close', {
             duration: 3000,
             horizontalPosition: 'center',
@@ -622,6 +656,10 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(confirmed => {
       if (confirmed) {
         this.entryService.deleteEntry(entry.id);
+
+        // Regenerate timeline after deleting entry
+        this.regenerateAllSegments();
+
         this.snackBar.open('Entry deleted successfully', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
