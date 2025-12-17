@@ -9,15 +9,12 @@
     <mat-icon>today</mat-icon>
   </button>
 
-  <!-- Virtual Scroll Viewport -->
-  <cdk-virtual-scroll-viewport
-    itemSize="100"
-    minBufferPx="800"
-    maxBufferPx="1200"
-    class="timeline-viewport"
-    (scrolledIndexChange)="onScroll()">
+  <!-- Timeline Viewport -->
+  <div #scrollContainer class="timeline-viewport" (scroll)="onScroll($event)">
+    <!-- Top sentinel for infinite scroll detection -->
+    <div #topSentinel class="scroll-sentinel"></div>
 
-    <div *cdkVirtualFor="let timelineDate of timelineDates(); trackBy: trackByDateKey"
+    <div *ngFor="let timelineDate of timelineDates(); trackBy: trackByDateKey"
          class="timeline-item">
 
       <!-- Skip Indicator -->
@@ -95,5 +92,7 @@
 
     </div>
 
-  </cdk-virtual-scroll-viewport>
+    <!-- Bottom sentinel for infinite scroll detection -->
+    <div #bottomSentinel class="scroll-sentinel"></div>
+  </div>
 </div>

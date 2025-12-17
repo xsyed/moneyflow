@@ -1,6 +1,6 @@
 .timeline-container {
   position: relative;
-  height: calc(100vh - 64px - 40px); // Full height minus toolbar and padding
+  height: calc(100vh - var(--mat-toolbar-standard-height, 64px) - 40px); // Full height minus toolbar and padding
   max-width: min(75%, 1600px);
   margin: 0 auto;
 }
@@ -24,6 +24,17 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding: 16px 0;
+}
+
+.scroll-sentinel {
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .timeline-item {
@@ -266,7 +277,7 @@
 // Responsive styles for mobile
 @media (max-width: 768px) {
   .timeline-container {
-    height: calc(100vh - 56px - 20px); // Smaller toolbar on mobile
+    height: calc(100vh - var(--mat-toolbar-mobile-height, 56px) - 20px); // Smaller toolbar on mobile
     max-width: 100%;
   }
 

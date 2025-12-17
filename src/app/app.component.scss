@@ -2,6 +2,16 @@ mat-toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  span {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+  }
+
+  button {
+    margin: 0;
+  }
 }
 
 .spacer {
@@ -9,7 +19,7 @@ mat-toolbar {
 }
 
 main {
-  height: calc(100vh - 64px);
+  height: calc(100vh - var(--mat-toolbar-standard-height, 64px));
   overflow: hidden;
 }
 

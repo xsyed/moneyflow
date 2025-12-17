@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewChild, AfterViewInit, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
@@ -53,7 +52,6 @@ interface EntryOccurrence {
   standalone: true,
   imports: [
     CommonModule,
-    ScrollingModule,
     MatListModule,
     MatDividerModule,
     MatButtonModule,
@@ -67,8 +65,15 @@ interface EntryOccurrence {
   styleUrl: './timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimelineComponent implements OnInit, AfterViewInit {
-  @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
+export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('topSentinel') topSentinel!: ElementRef<HTMLDivElement>;
+  @ViewChild('bottomSentinel') bottomSentinel!: ElementRef<HTMLDivElement>;
+
+  // IntersectionObserver for infinite scroll
+  private topObserver?: IntersectionObserver;
+  private bottomObserver?: IntersectionObserver;
+  private loadingMore = false;
 
   // Signals for reactive data
   private startDate = signal<Date>(this.getDateMonthsAgo(6));
@@ -151,42 +156,71 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     // Scroll to today after view is initialized
     setTimeout(() => {
       this.scrollToToday();
-      // Set initial visible index
-      const todayIdx = this.todayIndex();
-      if (todayIdx >= 0) {
-        this.currentVisibleIndex.set(todayIdx);
-      }
+      this.setupIntersectionObservers();
     }, 100);
+  }
+
+  ngOnDestroy(): void {
+    this.topObserver?.disconnect();
+    this.bottomObserver?.disconnect();
   }
 
   scrollToToday(): void {
     const index = this.todayIndex();
-    if (index >= 0 && this.viewport) {
-      this.viewport.scrollToIndex(index, 'smooth');
+    if (index >= 0 && this.scrollContainer) {
+      const container = this.scrollContainer.nativeElement;
+      const items = container.querySelectorAll('.timeline-item');
+      if (items[index]) {
+        items[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
   }
 
-  onScroll(): void {
-    if (!this.viewport) return;
+  onScroll(event: Event): void {
+    if (!this.scrollContainer) return;
 
-    const scrollIndex = this.viewport.getRenderedRange().start;
-    const totalItems = this.timelineDates().length;
+    const container = this.scrollContainer.nativeElement;
+    const items = container.querySelectorAll('.timeline-item');
 
-    // Update current visible index for "Scroll to Today" button visibility
-    this.currentVisibleIndex.set(scrollIndex);
+    // Find the first visible item to update current visible index
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i] as HTMLElement;
+      const rect = item.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
 
-    // Load more when within 20% of edges (adaptive threshold)
-    const threshold = Math.max(10, Math.floor(totalItems * 0.2));
-
-    // Load more past dates if scrolling near the top
-    if (scrollIndex < threshold) {
-      this.loadMorePast();
+      if (rect.top >= containerRect.top && rect.top <= containerRect.bottom) {
+        this.currentVisibleIndex.set(i);
+        break;
+      }
     }
+  }
 
-    // Load more future dates if scrolling near the bottom
-    if (scrollIndex > totalItems - threshold) {
-      this.loadMoreFuture();
-    }
+  private setupIntersectionObservers(): void {
+    const options: IntersectionObserverInit = {
+      root: this.scrollContainer.nativeElement,
+      rootMargin: '200px',
+      threshold: 0
+    };
+
+    // Top observer - load past dates
+    this.topObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !this.loadingMore) {
+        this.loadingMore = true;
+        this.loadMorePast();
+        setTimeout(() => this.loadingMore = false, 100);
+      }
+    }, options);
+    this.topObserver.observe(this.topSentinel.nativeElement);
+
+    // Bottom observer - load future dates
+    this.bottomObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !this.loadingMore) {
+        this.loadingMore = true;
+        this.loadMoreFuture();
+        setTimeout(() => this.loadingMore = false, 100);
+      }
+    }, options);
+    this.bottomObserver.observe(this.bottomSentinel.nativeElement);
   }
 
   private initializeCoreTimeline(): void {
@@ -234,6 +268,8 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     const currentStart = this.startDate();
     const newStart = this.getDateMonthsBeforeDate(currentStart, 3);
 
+    const currentScrollHeight = this.scrollContainer?.nativeElement.scrollHeight || 0;
+
     // Generate only the NEW 3 months
     const entries = this.entryService.entries();
     const newDates = this.generateTimelineDates(newStart, currentStart, entries);
@@ -241,6 +277,15 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     // Prepend to past cache
     this.pastDates.update(past => [...newDates, ...past]);
     this.startDate.set(newStart);
+
+    // Maintain scroll position after prepending
+    setTimeout(() => {
+      if (this.scrollContainer) {
+        const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+        const heightDiff = newScrollHeight - currentScrollHeight;
+        this.scrollContainer.nativeElement.scrollTop += heightDiff;
+      }
+    }, 0);
   }
 
   private loadMoreFuture(): void {
