@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, signal, computed, inject, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { MatListModule } from '@angular/material/list';
@@ -30,11 +30,22 @@ interface TimelineDate {
   showMonthHeader: boolean; // Show month header before this day
   daysSkipped?: number; // Number of days skipped before this row
   isToday: boolean; // Cache today check for filtering
+
+  // Pre-computed display values for performance
+  balance: number;
+  balanceFormatted: string;
+  balanceTooltip: string;
+  balanceTooltipClass: string;
+  isCurrentMonth: boolean;
+  monthEndDateFormatted?: string;
 }
 
 interface EntryOccurrence {
   entry: Entry;
   date: Date;
+
+  // Pre-computed display value for performance
+  amountFormatted: string;
 }
 
 @Component({
@@ -53,7 +64,8 @@ interface EntryOccurrence {
     MatTooltipModule
   ],
   templateUrl: './timeline.component.html',
-  styleUrl: './timeline.component.scss'
+  styleUrl: './timeline.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TimelineComponent implements OnInit, AfterViewInit {
   @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
@@ -62,13 +74,14 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   private startDate = signal<Date>(this.getDateMonthsAgo(6));
   private endDate = signal<Date>(this.getDateMonthsAhead(6));
 
-  // Computed timeline dates
-  timelineDates = computed<TimelineDate[]>(() => {
-    const start = this.startDate();
-    const end = this.endDate();
-    const entries = this.entryService.entries();
+  // Cached timeline segments for incremental generation
+  private pastDates = signal<TimelineDate[]>([]);
+  private coreDates = signal<TimelineDate[]>([]);
+  private futureDates = signal<TimelineDate[]>([]);
 
-    return this.generateTimelineDates(start, end, entries);
+  // Computed timeline dates - combines all segments
+  timelineDates = computed<TimelineDate[]>(() => {
+    return [...this.pastDates(), ...this.coreDates(), ...this.futureDates()];
   });
 
   todayIndex = computed(() => {
@@ -77,8 +90,39 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     return dates.findIndex(d => d.dateKey === todayKey);
   });
 
+  // Compute average item size dynamically based on actual content
+  estimateAverageItemSize = computed(() => {
+    const dates = this.timelineDates();
+    if (dates.length === 0) return 60;
+
+    const totalEstimated = dates.reduce((sum, date) => {
+      let size = 60; // Base date row height
+
+      // Add skip indicator height if present
+      if (date.daysSkipped && date.daysSkipped > 0) {
+        size += 24;
+      }
+
+      // Add height for each entry (~40px per entry)
+      size += date.entries.length * 40;
+
+      // Add height for month-end balance and header
+      if (date.isMonthEnd) {
+        size += 60; // month-end balance row
+        size += 50; // month header
+      }
+
+      return sum + size;
+    }, 0);
+
+    return Math.round(totalEstimated / dates.length);
+  });
+
   // Track the current visible date range
   private currentVisibleIndex = signal<number>(0);
+
+  // Mobile detection for performance optimizations
+  isMobile = signal<boolean>(false);
 
   // Show "Scroll to Today" button only if we're more than 1 month away from today
   showScrollToToday = computed(() => {
@@ -96,10 +140,21 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
-  constructor(public entryService: EntryService) {}
+  constructor(public entryService: EntryService) {
+    // Watch for entry changes and regenerate all segments
+    effect(() => {
+      const entries = this.entryService.entries();
+      // Trigger regeneration when entries change
+      this.regenerateAllSegments();
+    });
+  }
 
   ngOnInit(): void {
-    // Initialization handled by signals
+    // Detect mobile for performance optimizations
+    this.isMobile.set(window.innerWidth <= 768);
+
+    // Initialize core timeline (today ±6 months)
+    this.initializeCoreTimeline();
   }
 
   ngAfterViewInit(): void {
@@ -144,15 +199,67 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private initializeCoreTimeline(): void {
+    const start = this.getDateMonthsAgo(6);
+    const end = this.getDateMonthsAhead(6);
+    const entries = this.entryService.entries();
+
+    const dates = this.generateTimelineDates(start, end, entries);
+    this.coreDates.set(dates);
+    this.startDate.set(start);
+    this.endDate.set(end);
+  }
+
+  private regenerateAllSegments(): void {
+    const start = this.startDate();
+    const end = this.endDate();
+    const entries = this.entryService.entries();
+
+    // Split into segments
+    const coreStart = this.getDateMonthsAgo(6);
+    const coreEnd = this.getDateMonthsAhead(6);
+
+    // Generate past segment (if start is before core)
+    const pastDates = start < coreStart
+      ? this.generateTimelineDates(start, coreStart, entries)
+      : [];
+
+    // Generate core segment (today ±6 months)
+    const coreDates = this.generateTimelineDates(coreStart, coreEnd, entries);
+
+    // Generate future segment (if end is after core)
+    const futureDates = end > coreEnd
+      ? this.generateTimelineDates(coreEnd, end, entries)
+      : [];
+
+    this.pastDates.set(pastDates);
+    this.coreDates.set(coreDates);
+    this.futureDates.set(futureDates);
+  }
+
   private loadMorePast(): void {
     const currentStart = this.startDate();
     const newStart = this.getDateMonthsBeforeDate(currentStart, 3);
+
+    // Generate only the NEW 3 months
+    const entries = this.entryService.entries();
+    const newDates = this.generateTimelineDates(newStart, currentStart, entries);
+
+    // Prepend to past cache
+    this.pastDates.update(past => [...newDates, ...past]);
     this.startDate.set(newStart);
   }
 
   private loadMoreFuture(): void {
     const currentEnd = this.endDate();
     const newEnd = this.getDateMonthsAfterDate(currentEnd, 3);
+
+    // Generate only the NEW 3 months
+    const entries = this.entryService.entries();
+    const newDates = this.generateTimelineDates(currentEnd, newEnd, entries);
+
+    // Append to future cache
+    this.futureDates.update(future => [...future, ...newDates]);
     this.endDate.set(newEnd);
   }
 
@@ -167,6 +274,12 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
+
+    // Pre-fetch balanceMap for performance
+    const balanceMap = this.entryService.balanceMap();
+    const todayKey = this.formatDateKey(new Date());
+    const currentMonthNum = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
 
     let previousMonth = -1;
 
@@ -185,8 +298,14 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       // Calculate next month year for header
       const nextMonthYear = this.formatMonthYear(nextDay);
 
-      // Find all entries that occur on this date
+      // Find all entries that occur on this date (already includes amountFormatted)
       const entriesForDate = this.getEntriesForDate(currentDate, entries);
+
+      // PRE-COMPUTE: Balance and formatted values
+      const balance = balanceMap.get(dateKey) ?? this.entryService.settings()?.initialBalance ?? 0;
+      const balanceFormatted = this.entryService.formatCurrency(balance);
+      const isToday = dateKey === todayKey;
+      const isCurrentMonthFlag = nextDay.getMonth() === currentMonthNum && nextDay.getFullYear() === currentYear;
 
       timelineDates.push({
         date: new Date(currentDate),
@@ -199,7 +318,14 @@ export class TimelineComponent implements OnInit, AfterViewInit {
         entries: entriesForDate,
         showMonthHeader: false,
         daysSkipped: 0,
-        isToday: false
+        isToday: false,
+        // Pre-computed display values
+        balance,
+        balanceFormatted,
+        balanceTooltip: `Balance: ${balanceFormatted}`,
+        balanceTooltipClass: balance >= 0 ? 'positive-balance' : 'negative-balance',
+        isCurrentMonth: isCurrentMonthFlag,
+        monthEndDateFormatted: isMonthEnd ? this.formatMonthEndDate(currentDate) : undefined
       });
 
       previousMonth = currentMonth;
@@ -267,7 +393,8 @@ export class TimelineComponent implements OnInit, AfterViewInit {
         if (occurrenceKey === dateKey) {
           occurrences.push({
             entry,
-            date: occurrenceDate
+            date: occurrenceDate,
+            amountFormatted: this.formatAmountStatic(entry)
           });
         }
       }
@@ -372,6 +499,11 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   }
 
   formatAmount(entry: Entry): string {
+    const sign = entry.type === 'income' ? '+' : '-';
+    return `${sign}$${entry.amount.toLocaleString()}`;
+  }
+
+  private formatAmountStatic(entry: Entry): string {
     const sign = entry.type === 'income' ? '+' : '-';
     return `${sign}$${entry.amount.toLocaleString()}`;
   }
