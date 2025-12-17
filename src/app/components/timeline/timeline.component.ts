@@ -27,6 +27,9 @@ interface TimelineDate {
   monthYear: string; // "December 2024" for headers
   nextMonthYear: string; // "January 2025" for next month header
   entries: EntryOccurrence[];
+  showMonthHeader: boolean; // Show month header before this day
+  daysSkipped?: number; // Number of days skipped before this row
+  isToday: boolean; // Cache today check for filtering
 }
 
 interface EntryOccurrence {
@@ -127,13 +130,16 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     // Update current visible index for "Scroll to Today" button visibility
     this.currentVisibleIndex.set(scrollIndex);
 
-    // Load more past dates if scrolling near the top (within 30 items)
-    if (scrollIndex < 30) {
+    // Load more when within 20% of edges (adaptive threshold)
+    const threshold = Math.max(10, Math.floor(totalItems * 0.2));
+
+    // Load more past dates if scrolling near the top
+    if (scrollIndex < threshold) {
       this.loadMorePast();
     }
 
-    // Load more future dates if scrolling near the bottom (within 30 items from end)
-    if (scrollIndex > totalItems - 30) {
+    // Load more future dates if scrolling near the bottom
+    if (scrollIndex > totalItems - threshold) {
       this.loadMoreFuture();
     }
   }
@@ -190,14 +196,53 @@ export class TimelineComponent implements OnInit, AfterViewInit {
         isMonthEnd,
         monthYear,
         nextMonthYear,
-        entries: entriesForDate
+        entries: entriesForDate,
+        showMonthHeader: false,
+        daysSkipped: 0,
+        isToday: false
       });
 
       previousMonth = currentMonth;
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return timelineDates;
+    // PHASE 2: Filter to only relevant dates
+    return this.filterRelevantDates(timelineDates);
+  }
+
+  private filterRelevantDates(allDates: TimelineDate[]): TimelineDate[] {
+    const todayKey = this.formatDateKey(new Date());
+    const filtered: TimelineDate[] = [];
+
+    for (let i = 0; i < allDates.length; i++) {
+      const current = allDates[i];
+      const isToday = current.dateKey === todayKey;
+      const hasEntries = current.entries.length > 0;
+      const isMonthEnd = current.isMonthEnd;
+
+      // Include if: today, has entries, or month-end
+      if (isToday || hasEntries || isMonthEnd) {
+        // Calculate days skipped since last visible date
+        let daysSkipped = 0;
+        if (filtered.length > 0) {
+          const lastDate = filtered[filtered.length - 1].date;
+          const currentDate = current.date;
+          const daysDiff = Math.floor(
+            (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
+          );
+          daysSkipped = daysDiff - 1;
+        }
+
+        filtered.push({
+          ...current,
+          isToday,
+          daysSkipped,
+          showMonthHeader: false
+        });
+      }
+    }
+
+    return filtered;
   }
 
   private getEntriesForDate(date: Date, entries: Entry[]): EntryOccurrence[] {
@@ -331,11 +376,44 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     return dateKey === this.formatDateKey(new Date());
   }
 
-  trackByDateKey(index: number, item: TimelineDate): string {
+  isCurrentMonth(date: Date): boolean {
+    const now = new Date();
+    const nextMonth = new Date(date);
+    nextMonth.setDate(nextMonth.getDate() + 1); // Get the next day (which is the first day of next month)
+
+    return nextMonth.getMonth() === now.getMonth() &&
+           nextMonth.getFullYear() === now.getFullYear();
+  }
+
+  trackByDateKey(_index: number, item: TimelineDate): string {
     return item.dateKey;
   }
 
-  onEntryClick(entry: Entry, occurrenceDate: Date): void {
+  onDateRowClick(date: Date, event: Event): void {
+    // Open add entry dialog with pre-filled date
+    const dialogRef = this.dialog.open(EntryDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      data: {
+        initialDate: date
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'added') {
+        this.snackBar.open('Entry created successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
+        });
+      }
+    });
+  }
+
+  onEntryClick(entry: Entry, occurrenceDate: Date, event: Event): void {
+    // Stop propagation to prevent triggering the date row click
+    event.stopPropagation();
+
     const bottomSheetRef = this.bottomSheet.open(EntryActionsSheetComponent, {
       data: entry
     });

@@ -14,9 +14,10 @@ import { RepeatType, EntryType, Entry } from '../../models/entry.model';
 import { UpdateOption } from '../update-options-dialog/update-options-dialog.component';
 
 export interface EntryDialogData {
-  entry: Entry;
+  entry?: Entry;
   occurrenceDate?: Date;
   updateOption?: UpdateOption | null;
+  initialDate?: Date;
 }
 
 @Component({
@@ -53,12 +54,15 @@ export class EntryDialogComponent {
   days = Array.from({ length: 31 }, (_, i) => i + 1);
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: EntryDialogData | Entry | null) {
+    let initialDate: Date | null = null;
+
     // Handle both old and new data formats for backward compatibility
     if (data && 'entry' in data) {
-      // New format: { entry, occurrenceDate, updateOption }
-      this.entry = data.entry;
+      // New format: { entry, occurrenceDate, updateOption, initialDate }
+      this.entry = data.entry || null;
       this.occurrenceDate = data.occurrenceDate || null;
       this.updateOption = data.updateOption || null;
+      initialDate = data.initialDate || null;
     } else {
       // Old format: just the entry (for adding new entries)
       this.entry = data as Entry;
@@ -68,13 +72,16 @@ export class EntryDialogComponent {
     this.isEditMode.set(!!this.entry);
 
     // Initialize form with default or existing values
+    const defaultDayOfMonth = initialDate ? initialDate.getDate() : 1;
+    const defaultStartDate = initialDate ? new Date(initialDate) : null;
+
     this.entryForm = this.fb.group({
       label: [this.entry?.label || '', [Validators.required, Validators.minLength(1)]],
       amount: [this.entry?.amount || '', [Validators.required, Validators.min(0.01)]],
       type: [this.entry?.type || 'expense' as EntryType, Validators.required],
       repeatType: [this.entry?.repeatType || 'monthly' as RepeatType, Validators.required],
-      dayOfMonth: [this.entry?.dayOfMonth || 1, [Validators.required, Validators.min(1), Validators.max(31)]],
-      startDate: [this.entry?.startDate ? new Date(this.entry.startDate) : null]
+      dayOfMonth: [this.entry?.dayOfMonth || defaultDayOfMonth, [Validators.required, Validators.min(1), Validators.max(31)]],
+      startDate: [this.entry?.startDate ? new Date(this.entry.startDate) : defaultStartDate]
     });
 
     // Set initial repeat type from data

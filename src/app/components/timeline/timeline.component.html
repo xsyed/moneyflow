@@ -18,12 +18,23 @@
     <div *cdkVirtualFor="let timelineDate of timelineDates(); trackBy: trackByDateKey"
          class="timeline-item">
 
+      <!-- Skip Indicator -->
+      <div *ngIf="timelineDate.daysSkipped && timelineDate.daysSkipped > 0"
+           class="skip-indicator">
+        <div class="skip-line"></div>
+        <div class="skip-label">{{ timelineDate.daysSkipped }} days</div>
+        <div class="skip-line"></div>
+      </div>
+
       <!-- Date Row -->
       <div class="date-row"
            [class.today]="isToday(timelineDate.dateKey)"
            [matTooltip]="getBalanceTooltip(timelineDate.date)"
            [matTooltipClass]="getBalanceTooltipClass(timelineDate.date)"
-           matTooltipPosition="left">
+           matTooltipPosition="left"
+           [matTooltipShowDelay]="300"
+           [matTooltipHideDelay]="0"
+           (click)="onDateRowClick(timelineDate.date, $event)">
         <!-- Date Label -->
         <div class="date-label">
           {{ timelineDate.displayDate }}
@@ -42,7 +53,7 @@
                  class="entry-item"
                  [class.income]="occurrence.entry.type === 'income'"
                  [class.expense]="occurrence.entry.type === 'expense'"
-                 (click)="onEntryClick(occurrence.entry, occurrence.date)">
+                 (click)="onEntryClick(occurrence.entry, occurrence.date, $event)">
 
               <div class="entry-connector">──</div>
               <div class="entry-label">{{ occurrence.entry.label }}</div>
@@ -72,9 +83,12 @@
       </div>
 
       <!-- Month Header (shown after month-end balance) -->
-      <div *ngIf="timelineDate.isMonthEnd" class="month-header">
+      <div *ngIf="timelineDate.isMonthEnd"
+           class="month-header"
+           [class.current-month]="isCurrentMonth(timelineDate.date)">
         {{ timelineDate.nextMonthYear }}
       </div>
+
     </div>
 
   </cdk-virtual-scroll-viewport>
