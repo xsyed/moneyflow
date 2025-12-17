@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { EntryService } from '../../services/entry.service';
 import { RepeatType, EntryType, Entry } from '../../models/entry.model';
 import { UpdateOption } from '../update-options-dialog/update-options-dialog.component';
+import { fromUTC } from '../../utils/date.utils';
 
 export interface EntryDialogData {
   entry?: Entry;
@@ -82,8 +83,8 @@ export class EntryDialogComponent {
       type: [this.entry?.type || 'expense' as EntryType, Validators.required],
       repeatType: [this.entry?.repeatType || 'monthly' as RepeatType, Validators.required],
       dayOfMonth: [this.entry?.dayOfMonth || defaultDayOfMonth, [Validators.required, Validators.min(1), Validators.max(31)]],
-      startDate: [this.entry?.startDate ? new Date(this.entry.startDate) : defaultStartDate],
-      specificDate: [this.entry?.specificDate ? new Date(this.entry.specificDate) : defaultStartDate]
+      startDate: [this.entry?.startDate ? fromUTC(new Date(this.entry.startDate)) : defaultStartDate],
+      specificDate: [this.entry?.specificDate ? fromUTC(new Date(this.entry.specificDate)) : defaultStartDate]
     });
 
     // Set initial repeat type from data
