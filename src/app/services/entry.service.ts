@@ -102,13 +102,18 @@ export class EntryService {
   private generateAllOccurrences(
     entries: Entry[],
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    settings?: AppSettings
   ): Array<{ entry: Entry; date: Date }> {
     const occurrences: Array<{ entry: Entry; date: Date }> = [];
 
     // Generate all occurrences for each entry
     for (const entry of entries) {
-      const entryOccurrences = generateOccurrences(entry, startDate, endDate);
+      const entryOccurrences = generateOccurrences(
+        entry,
+        startDate,
+        endDate
+      );
       for (const date of entryOccurrences) {
         occurrences.push({ entry, date });
       }
@@ -137,14 +142,16 @@ export class EntryService {
     const balanceSetDate = new Date(settings.balanceSetDate);
     balanceSetDate.setHours(0, 0, 0, 0);
 
-    // Define calculation range: 1 year past + 1.5 years future (2.5 years total)
-    const startDate = new Date(balanceSetDate);
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    const endDate = new Date(balanceSetDate);
-    endDate.setMonth(endDate.getMonth() + 18); // 1.5 years = 18 months
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Generate all occurrences
-    const allOccurrences = this.generateAllOccurrences(entries, startDate, endDate);
+    // Define calculation range: from min(balanceSetDate, today) to today + 18 months
+    const startDate = new Date(Math.min(balanceSetDate.getTime(), today.getTime()));
+    const endDate = new Date(today);
+    endDate.setMonth(endDate.getMonth() + 18); // 18 months forward
+
+    // Generate all occurrences with cutoff settings
+    const allOccurrences = this.generateAllOccurrences(entries, startDate, endDate, settings);
 
     // Sort by date
     allOccurrences.sort((a, b) => a.date.getTime() - b.date.getTime());

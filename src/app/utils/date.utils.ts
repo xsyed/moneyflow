@@ -7,6 +7,15 @@ export function generateOccurrences(
 ): Date[] {
   const occurrences: Date[] = [];
 
+  // For recurring entries, always limit to today or later
+  let effectiveStartDate = new Date(startDate);
+
+  if (entry.repeatType !== 'once') {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    effectiveStartDate = new Date(Math.max(startDate.getTime(), today.getTime()));
+  }
+
   if (entry.repeatType === 'once') {
     // One-time entry on a specific date
     if (!entry.specificDate) {
@@ -23,14 +32,14 @@ export function generateOccurrences(
       return occurrences;
     }
 
-    let currentDate = new Date(startDate);
+    let currentDate = new Date(effectiveStartDate);
     currentDate.setDate(1);
 
     while (currentDate <= endDate) {
       const occurrence = new Date(currentDate);
       occurrence.setDate(Math.min(entry.dayOfMonth, getDaysInMonth(occurrence)));
 
-      if (occurrence >= startDate && occurrence <= endDate) {
+      if (occurrence >= effectiveStartDate && occurrence <= endDate) {
         occurrences.push(new Date(occurrence));
       }
 
@@ -47,7 +56,8 @@ export function generateOccurrences(
 
     let currentDate = new Date(entryStartDate);
 
-    while (currentDate < startDate) {
+    // Skip forward to first occurrence >= effectiveStartDate
+    while (currentDate < effectiveStartDate) {
       currentDate.setDate(currentDate.getDate() + intervalDays);
     }
 

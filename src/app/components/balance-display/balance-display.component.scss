@@ -10,6 +10,14 @@
   width: 20px;
   height: 20px;
   color: rgba(255, 255, 255, 0.9);
+
+  &.positive {
+    color: #2e7d32;
+  }
+
+  &.negative {
+    color: #c62828;
+  }
 }
 
 .balance-amount {

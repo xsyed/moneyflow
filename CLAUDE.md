@@ -15,6 +15,7 @@ A responsive web app for tracking recurring income and expenses on a visual time
 - **Timeline:** Infinite scroll both past and future
 - **Weekly/Biweekly:** Based on specific start date
 - **Filtering:** Not needed - simple scroll navigation
+- **Recurring Entries:** Only appear from today forward, never retroactively (one-time entries can be for any date)
 
 ## Implementation Phases
 
@@ -29,6 +30,7 @@ A responsive web app for tracking recurring income and expenses on a visual time
 | 7 | Initial Balance Setup | `phase-7-initial-balance.md` | ✅ Complete |
 | 7.1 | UI Enhancements & Features | `phase-7-initial-balance.md` (section 7.1) | ✅ Complete |
 | 7.2 | Filtered Timeline Display | `plan/phase-7.2.md` | ✅ Complete |
+| 7.3 | Non-Recurring Entries | `plan/phase-7.3.md` | Pending |
 | 8 | Polish & Responsive | `phase-8-polish.md` | Pending |
 
 ## Project Structure (Target)
@@ -56,10 +58,12 @@ money-stream/
 interface Entry {
   id: string;
   label: string;
+  note?: string;              // Optional note, max 100 characters
   amount: number;
   type: 'income' | 'expense';
   dayOfMonth?: number;        // For monthly repeat
   startDate?: Date;           // For weekly/biweekly
-  repeatType: 'monthly' | 'weekly' | 'biweekly';
+  specificDate?: Date;        // For one-time entries
+  repeatType: 'monthly' | 'weekly' | 'biweekly' | 'once';
 }
 ```

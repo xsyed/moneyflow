@@ -256,7 +256,11 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     dayEnd.setHours(23, 59, 59, 999);
 
     for (const entry of entries) {
-      const entryOccurrences = generateOccurrences(entry, dayStart, dayEnd);
+      const entryOccurrences = generateOccurrences(
+        entry,
+        dayStart,
+        dayEnd
+      );
 
       for (const occurrenceDate of entryOccurrences) {
         const occurrenceKey = this.formatDateKey(occurrenceDate);

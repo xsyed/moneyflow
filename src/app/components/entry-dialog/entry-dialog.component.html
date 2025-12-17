@@ -15,6 +15,13 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Note Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Note (Optional)</mat-label>
+      <input matInput formControlName="note" placeholder="Add a note..." maxlength="100">
+      <mat-hint align="end">{{ entryForm.get('note')?.value?.length || 0 }}/100</mat-hint>
+    </mat-form-field>
+
     <!-- Amount Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Amount</mat-label>
@@ -41,6 +48,7 @@
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Repeat</mat-label>
       <mat-select formControlName="repeatType" required>
+        <mat-option value="once">Once</mat-option>
         <mat-option value="monthly">Monthly</mat-option>
         <mat-option value="weekly">Weekly</mat-option>
         <mat-option value="biweekly">Biweekly</mat-option>
@@ -75,6 +83,21 @@
       <mat-hint>First occurrence date</mat-hint>
       <mat-error *ngIf="entryForm.get('startDate')?.hasError('required')">
         Start date is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Specific Date (for Once) -->
+    <mat-form-field
+      *ngIf="repeatType() === 'once'"
+      appearance="outline"
+      class="full-width">
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="specificPicker" formControlName="specificDate" required>
+      <mat-datepicker-toggle matIconSuffix [for]="specificPicker"></mat-datepicker-toggle>
+      <mat-datepicker #specificPicker></mat-datepicker>
+      <mat-hint>Date when this entry occurs</mat-hint>
+      <mat-error *ngIf="entryForm.get('specificDate')?.hasError('required')">
+        Date is required
       </mat-error>
     </mat-form-field>
 

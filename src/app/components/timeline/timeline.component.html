@@ -55,8 +55,10 @@
                  [class.expense]="occurrence.entry.type === 'expense'"
                  (click)="onEntryClick(occurrence.entry, occurrence.date, $event)">
 
-              <div class="entry-connector">──</div>
-              <div class="entry-label">{{ occurrence.entry.label }}</div>
+              <div class="entry-content">
+                <div class="entry-label">{{ occurrence.entry.label }}</div>
+                <div *ngIf="occurrence.entry.note" class="entry-note">{{ occurrence.entry.note }}</div>
+              </div>
               <div class="entry-amount">
                 {{ formatAmount(occurrence.entry) }}
               </div>

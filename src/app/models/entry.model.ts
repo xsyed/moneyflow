@@ -4,6 +4,7 @@ export type EntryType = 'income' | 'expense';
 export interface Entry {
   id: string;
   label: string;
+  note?: string;            // Optional note, max 100 characters
   amount: number;
   type: EntryType;
   dayOfMonth?: number;      // 1-31, used for monthly repeat

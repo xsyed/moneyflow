@@ -37,7 +37,9 @@ export class StorageService {
   loadSettings(): AppSettings | null {
     try {
       const stored = localStorage.getItem(this.SETTINGS_KEY);
-      return stored ? JSON.parse(stored) : null;
+      const settings: AppSettings | null = stored ? JSON.parse(stored) : null;
+
+      return settings;
     } catch (error) {
       console.error('Error loading settings from localStorage:', error);
       return null;

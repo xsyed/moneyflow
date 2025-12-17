@@ -77,11 +77,13 @@ export class EntryDialogComponent {
 
     this.entryForm = this.fb.group({
       label: [this.entry?.label || '', [Validators.required, Validators.minLength(1)]],
+      note: [this.entry?.note || '', [Validators.maxLength(100)]],
       amount: [this.entry?.amount || '', [Validators.required, Validators.min(0.01)]],
       type: [this.entry?.type || 'expense' as EntryType, Validators.required],
       repeatType: [this.entry?.repeatType || 'monthly' as RepeatType, Validators.required],
       dayOfMonth: [this.entry?.dayOfMonth || defaultDayOfMonth, [Validators.required, Validators.min(1), Validators.max(31)]],
-      startDate: [this.entry?.startDate ? new Date(this.entry.startDate) : defaultStartDate]
+      startDate: [this.entry?.startDate ? new Date(this.entry.startDate) : defaultStartDate],
+      specificDate: [this.entry?.specificDate ? new Date(this.entry.specificDate) : defaultStartDate]
     });
 
     // Set initial repeat type from data
@@ -104,21 +106,34 @@ export class EntryDialogComponent {
   private updateConditionalValidation(repeatType: RepeatType): void {
     const dayOfMonthControl = this.entryForm.get('dayOfMonth');
     const startDateControl = this.entryForm.get('startDate');
+    const specificDateControl = this.entryForm.get('specificDate');
 
     if (repeatType === 'monthly') {
-      // Monthly: require dayOfMonth, clear startDate
+      // Monthly: require dayOfMonth, clear startDate and specificDate
       dayOfMonthControl?.setValidators([Validators.required, Validators.min(1), Validators.max(31)]);
       startDateControl?.clearValidators();
       startDateControl?.setValue(null);
-    } else {
-      // Weekly/Biweekly: require startDate, clear dayOfMonth
+      specificDateControl?.clearValidators();
+      specificDateControl?.setValue(null);
+    } else if (repeatType === 'weekly' || repeatType === 'biweekly') {
+      // Weekly/Biweekly: require startDate, clear dayOfMonth and specificDate
       startDateControl?.setValidators([Validators.required]);
       dayOfMonthControl?.clearValidators();
       dayOfMonthControl?.setValue(null);
+      specificDateControl?.clearValidators();
+      specificDateControl?.setValue(null);
+    } else if (repeatType === 'once') {
+      // Once: require specificDate, clear dayOfMonth and startDate
+      specificDateControl?.setValidators([Validators.required]);
+      dayOfMonthControl?.clearValidators();
+      dayOfMonthControl?.setValue(null);
+      startDateControl?.clearValidators();
+      startDateControl?.setValue(null);
     }
 
     dayOfMonthControl?.updateValueAndValidity();
     startDateControl?.updateValueAndValidity();
+    specificDateControl?.updateValueAndValidity();
   }
 
   onCancel(): void {
@@ -132,6 +147,7 @@ export class EntryDialogComponent {
       // Build base entry data
       const entryData: any = {
         label: formValue.label.trim(),
+        note: formValue.note?.trim() || undefined,
         amount: parseFloat(formValue.amount),
         type: formValue.type,
         repeatType: formValue.repeatType
@@ -145,7 +161,7 @@ export class EntryDialogComponent {
         entryData.startDate = this.toUTC(formValue.startDate).toISOString();
       } else if (formValue.repeatType === 'once') {
         // For one-time entries, store the specific date
-        entryData.specificDate = this.toUTC(formValue.startDate).toISOString();
+        entryData.specificDate = this.toUTC(formValue.specificDate).toISOString();
       }
 
       // Handle different scenarios

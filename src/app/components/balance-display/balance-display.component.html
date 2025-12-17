@@ -1,5 +1,7 @@
 <div *ngIf="hasInitialBalance()" class="balance-inline">
-  <mat-icon class="balance-icon">account_balance_wallet</mat-icon>
+  <mat-icon class="balance-icon"
+            [class.positive]="isPositive()"
+            [class.negative]="isNegative()">account_balance_wallet</mat-icon>
   <span class="balance-amount"
         [class.positive]="isPositive()"
         [class.negative]="isNegative()">
