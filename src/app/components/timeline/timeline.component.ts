@@ -115,9 +115,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (todayIdx < 0) return false; // Today not in range
 
-    // Calculate difference in days (approximate 30 days = 1 month)
-    const daysDifference = Math.abs(visibleIndex - todayIdx);
-    return daysDifference > 30;
+    // Calculate difference in months
+    const monthsDifference = Math.abs(visibleIndex - todayIdx);
+    return monthsDifference > 1;
   });
 
   private bottomSheet = inject(MatBottomSheet);
