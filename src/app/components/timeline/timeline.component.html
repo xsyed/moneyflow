@@ -90,8 +90,8 @@
           Balance as of {{ timelineDate.monthEndDateFormatted }}
         </div>
         <div class="month-end-amount"
-             [class.positive]="timelineDate.balance >= 0"
-             [class.negative]="timelineDate.balance < 0">
+             [class.positive]="timelineDate.monthEndArrow === 'up'"
+             [class.negative]="timelineDate.monthEndArrow === 'down'">
           <mat-icon *ngIf="timelineDate.monthEndArrow === 'up'" class="month-end-arrow arrow-up">arrow_upward</mat-icon>
           <mat-icon *ngIf="timelineDate.monthEndArrow === 'down'" class="month-end-arrow arrow-down">arrow_downward</mat-icon>
           {{ timelineDate.balanceFormatted }}
