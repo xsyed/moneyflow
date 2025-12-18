@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
@@ -130,11 +130,14 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     effect(() => {
       // Track entries signal - this makes the effect reactive
       const entries = this.entryService.entries();
-      // Only regenerate if already initialized (use plain boolean to avoid infinite loop)
-      if (this.initialized) {
-        this.regenerateAllSegments();
-      }
-    }, { allowSignalWrites: true });
+      // Use untracked to prevent signal writes during effect execution
+      untracked(() => {
+        // Only regenerate if already initialized
+        if (this.initialized) {
+          this.regenerateAllSegments();
+        }
+      });
+    });
   }
 
   ngOnInit(): void {

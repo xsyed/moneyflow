@@ -1,4 +1,4 @@
-import { Component, inject, signal, effect, Inject, Optional } from '@angular/core';
+import { Component, inject, signal, effect, untracked, Inject, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -95,7 +95,10 @@ export class EntryDialogComponent {
     // Set up effect to handle conditional validation
     effect(() => {
       const repeat = this.repeatType();
-      this.updateConditionalValidation(repeat);
+      // Use untracked to prevent any potential signal writes during validation
+      untracked(() => {
+        this.updateConditionalValidation(repeat);
+      });
     });
 
     // Listen to repeatType changes

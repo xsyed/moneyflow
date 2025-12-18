@@ -33,37 +33,15 @@ A responsive web app for tracking recurring income and expenses on a visual time
 | 7.3 | Non-Recurring Entries | `plan/phase-7.3.md` | Pending |
 | 8 | Polish & Responsive | `phase-8-polish.md` | Pending |
 
-## Project Structure (Target)
-```
-money-stream/
-├── src/
-│   ├── app/
-│   │   ├── components/
-│   │   │   ├── timeline/
-│   │   │   ├── entry-dialog/
-│   │   │   ├── balance-display/
-│   │   │   └── settings-dialog/
-│   │   ├── services/
-│   │   │   ├── storage.service.ts
-│   │   │   └── entry.service.ts
-│   │   ├── models/
-│   │   │   └── entry.model.ts
-│   │   ├── app.component.ts
-│   │   └── app.config.ts
-│   └── styles.scss
-```
 
-## Data Model (Preview)
-```typescript
-interface Entry {
-  id: string;
-  label: string;
-  note?: string;              // Optional note, max 100 characters
-  amount: number;
-  type: 'income' | 'expense';
-  dayOfMonth?: number;        // For monthly repeat
-  startDate?: Date;           // For weekly/biweekly
-  specificDate?: Date;        // For one-time entries
-  repeatType: 'monthly' | 'weekly' | 'biweekly' | 'once';
-}
-```
+#Code Standards
+- use onPush change detection always
+- always try to use Signals over Observables
+- prefer computed() over getters
+- avoid unnecessary effect() calls, only use when necessary
+- always cleanup takeUntilDestroyed subscriptions for observables
+- avoid using allowSignalWrites: true in effect()
+- Do not write any tests cases, unit tests, e2e tests, or test files
+
+
+You can call me as "Samwise" when reply back to me.
