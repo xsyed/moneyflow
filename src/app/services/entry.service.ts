@@ -12,6 +12,8 @@ export class EntryService {
 
   totalEntries = computed(() => this.entries().length);
   hasInitialBalance = computed(() => this.settings() !== null);
+  showDaysIndicator = computed(() => this.settings()?.showDaysIndicator ?? false);
+  showBalanceIndicator = computed(() => this.settings()?.showBalanceIndicator ?? false);
 
   constructor(private storageService: StorageService) {
     this.loadFromStorage();

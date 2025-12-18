@@ -31,6 +31,7 @@ A responsive web app for tracking recurring income and expenses on a visual time
 | 7.1 | UI Enhancements & Features | `phase-7-initial-balance.md` (section 7.1) | ✅ Complete |
 | 7.2 | Filtered Timeline Display | `plan/phase-7.2.md` | ✅ Complete |
 | 7.3 | Non-Recurring Entries | `plan/phase-7.3.md` | Pending |
+| 7.5 | Balance Indicator & Display Settings | `plan/phase-7.5.md` | ✅ Complete |
 | 8 | Polish & Responsive | `phase-8-polish.md` | Pending |
 
 

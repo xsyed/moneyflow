@@ -40,6 +40,21 @@
       <mat-hint>The date this balance applies from</mat-hint>
     </mat-form-field>
 
+    <!-- Display Options Section -->
+    <div class="display-options">
+      <h4 class="section-title">Display Options</h4>
+
+      <mat-checkbox formControlName="showDaysIndicator" color="primary">
+        Show days indicator
+      </mat-checkbox>
+      <p class="option-hint">Display "X days" between timeline entries</p>
+
+      <mat-checkbox formControlName="showBalanceIndicator" color="primary">
+        Show balance indicator
+      </mat-checkbox>
+      <p class="option-hint">Display running balance after each day's entries</p>
+    </div>
+
   </form>
 </mat-dialog-content>
 

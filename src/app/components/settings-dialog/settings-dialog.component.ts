@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { EntryService } from '../../services/entry.service';
 import { AppSettings } from '../../models/entry.model';
 
@@ -19,7 +20,8 @@ import { AppSettings } from '../../models/entry.model';
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
-    MatButtonModule
+    MatButtonModule,
+    MatCheckboxModule
   ],
   templateUrl: './settings-dialog.component.html',
   styleUrl: './settings-dialog.component.scss'
@@ -43,7 +45,9 @@ export class SettingsDialogComponent {
       balanceSetDate: [
         currentSettings?.balanceSetDate ? new Date(currentSettings.balanceSetDate) : new Date(),
         Validators.required
-      ]
+      ],
+      showDaysIndicator: [currentSettings?.showDaysIndicator ?? false],
+      showBalanceIndicator: [currentSettings?.showBalanceIndicator ?? false]
     });
 
     // Track changes to enable/disable save button
@@ -63,7 +67,9 @@ export class SettingsDialogComponent {
       // Create updated settings
       const newSettings: AppSettings = {
         initialBalance: parseFloat(formValue.initialBalance),
-        balanceSetDate: this.toUTC(formValue.balanceSetDate).toISOString()
+        balanceSetDate: this.toUTC(formValue.balanceSetDate).toISOString(),
+        showDaysIndicator: formValue.showDaysIndicator,
+        showBalanceIndicator: formValue.showBalanceIndicator
       };
 
       // Update via service method

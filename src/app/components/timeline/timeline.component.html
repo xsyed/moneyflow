@@ -18,7 +18,7 @@
          class="timeline-item">
 
       <!-- Skip Indicator -->
-      <div *ngIf="timelineDate.daysSkipped && timelineDate.daysSkipped > 0"
+      <div *ngIf="entryService.showDaysIndicator() && timelineDate.daysSkipped && timelineDate.daysSkipped > 0"
            class="skip-indicator">
         <div class="skip-line"></div>
         <div class="skip-label">{{ timelineDate.daysSkipped }} days</div>
@@ -71,6 +71,19 @@
         </div>
       </div>
 
+      <!-- Balance Indicator -->
+      <div *ngIf="timelineDate.showBalanceIndicator" class="balance-indicator">
+        <div class="balance-line"></div>
+        <div class="balance-content"
+             [class.balance-up]="timelineDate.balanceChange === 'up'"
+             [class.balance-down]="timelineDate.balanceChange === 'down'">
+          <mat-icon *ngIf="timelineDate.balanceChange === 'up'" class="balance-arrow">arrow_upward</mat-icon>
+          <mat-icon *ngIf="timelineDate.balanceChange === 'down'" class="balance-arrow">arrow_downward</mat-icon>
+          <span class="balance-value">{{ timelineDate.balanceFormatted }}</span>
+        </div>
+        <div class="balance-line"></div>
+      </div>
+
       <!-- Month-End Balance Row -->
       <div *ngIf="timelineDate.isMonthEnd" class="month-end-balance-row">
         <div class="month-end-label">
@@ -79,6 +92,8 @@
         <div class="month-end-amount"
              [class.positive]="timelineDate.balance >= 0"
              [class.negative]="timelineDate.balance < 0">
+          <mat-icon *ngIf="timelineDate.monthEndArrow === 'up'" class="month-end-arrow arrow-up">arrow_upward</mat-icon>
+          <mat-icon *ngIf="timelineDate.monthEndArrow === 'down'" class="month-end-arrow arrow-down">arrow_downward</mat-icon>
           {{ timelineDate.balanceFormatted }}
         </div>
       </div>

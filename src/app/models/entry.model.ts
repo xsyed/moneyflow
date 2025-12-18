@@ -19,4 +19,6 @@ export interface Entry {
 export interface AppSettings {
   initialBalance: number;
   balanceSetDate: string;   // Date from which balance calculations start
+  showDaysIndicator?: boolean;    // Toggle for "X days" skip indicator (default: false)
+  showBalanceIndicator?: boolean; // Toggle for balance indicator (default: false)
 }

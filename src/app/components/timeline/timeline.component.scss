@@ -228,12 +228,29 @@
   font-size: 20px;
   font-weight: 700;
   font-family: 'Roboto Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
   &.positive {
     color: #2e7d32;
   }
 
   &.negative {
+    color: #c62828;
+  }
+}
+
+.month-end-arrow {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+
+  &.arrow-up {
+    color: #2e7d32;
+  }
+
+  &.arrow-down {
     color: #c62828;
   }
 }
@@ -271,6 +288,64 @@
   white-space: nowrap;
   font-weight: 500;
   color: #757575;
+}
+
+.balance-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  margin: 4px 0;
+}
+
+.balance-line {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    #bdbdbd,
+    #bdbdbd 4px,
+    transparent 4px,
+    transparent 8px
+  );
+
+  @media (max-width: 768px) {
+    background: #bdbdbd;
+    opacity: 0.5;
+  }
+}
+
+.balance-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  color: #616161;
+
+  &.balance-up {
+    color: #2e7d32;
+
+    .balance-arrow {
+      color: #2e7d32;
+    }
+  }
+
+  &.balance-down {
+    color: #c62828;
+
+    .balance-arrow {
+      color: #c62828;
+    }
+  }
+}
+
+.balance-arrow {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 // Responsive styles for mobile
@@ -336,9 +411,29 @@
     font-size: 16px;
   }
 
+  .month-end-arrow {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
   .skip-indicator {
     padding: 6px 16px;
     font-size: 11px;
+  }
+
+  .balance-indicator {
+    padding: 6px 16px;
+  }
+
+  .balance-content {
+    font-size: 12px;
+  }
+
+  .balance-arrow {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -365,5 +460,25 @@
 
   .month-header {
     font-size: 13px;
+  }
+
+  .month-end-amount {
+    font-size: 14px;
+  }
+
+  .month-end-arrow {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .balance-content {
+    font-size: 11px;
+  }
+
+  .balance-arrow {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
   }
 }

@@ -39,6 +39,14 @@ interface TimelineDate {
   balanceTooltipClass: string;
   isCurrentMonth: boolean;
   monthEndDateFormatted?: string;
+
+  // Balance indicator values
+  showBalanceIndicator: boolean;
+  previousDayBalance: number;
+  balanceChange: 'up' | 'down' | 'none';
+
+  // Month-end balance arrow
+  monthEndArrow: 'up' | 'down' | 'none';
 }
 
 interface EntryOccurrence {
@@ -319,6 +327,13 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     this.endDate.set(newEnd);
   }
 
+  private getPreviousDayBalance(dateKey: string, balanceMap: Map<string, number>): number {
+    const date = new Date(dateKey);
+    date.setDate(date.getDate() - 1);
+    const prevKey = this.formatDateKey(date);
+    return balanceMap.get(prevKey) ?? this.entryService.settings()?.initialBalance ?? 0;
+  }
+
   private generateTimelineDates(
     startDate: Date,
     endDate: Date,
@@ -335,8 +350,10 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const balanceMap = this.entryService.balanceMap();
     const currentMonthNum = new Date().getMonth();
     const currentYear = new Date().getFullYear();
+    const showBalanceIndicatorSetting = this.entryService.showBalanceIndicator();
 
     let previousMonth = -1;
+    let previousMonthEndBalance: number | null = null;
 
     while (currentDate <= end) {
       const dateKey = this.formatDateKey(currentDate);
@@ -361,6 +378,21 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       const balanceFormatted = this.entryService.formatCurrency(balance);
       const isCurrentMonthFlag = nextDay.getMonth() === currentMonthNum && nextDay.getFullYear() === currentYear;
 
+      // Compute balance indicator data (only if setting enabled for performance)
+      const previousDayBalance = showBalanceIndicatorSetting
+        ? this.getPreviousDayBalance(dateKey, balanceMap)
+        : 0;
+      const balanceChange: 'up' | 'down' | 'none' =
+        balance > previousDayBalance ? 'up' :
+        balance < previousDayBalance ? 'down' : 'none';
+
+      // Compute month-end arrow (compare with previous month's ending balance)
+      let monthEndArrow: 'up' | 'down' | 'none' = 'none';
+      if (isMonthEnd && previousMonthEndBalance !== null) {
+        monthEndArrow = balance > previousMonthEndBalance ? 'up' :
+                        balance < previousMonthEndBalance ? 'down' : 'none';
+      }
+
       timelineDates.push({
         date: new Date(currentDate),
         dateKey,
@@ -379,8 +411,19 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         balanceTooltip: `Balance: ${balanceFormatted}`,
         balanceTooltipClass: balance >= 0 ? 'positive-balance' : 'negative-balance',
         isCurrentMonth: isCurrentMonthFlag,
-        monthEndDateFormatted: isMonthEnd ? this.formatMonthEndDate(currentDate) : undefined
+        monthEndDateFormatted: isMonthEnd ? this.formatMonthEndDate(currentDate) : undefined,
+        // Balance indicator values
+        showBalanceIndicator: false, // Will be set in filterRelevantDates
+        previousDayBalance,
+        balanceChange,
+        // Month-end balance arrow
+        monthEndArrow
       });
+
+      // Track previous month-end balance for next iteration
+      if (isMonthEnd) {
+        previousMonthEndBalance = balance;
+      }
 
       previousMonth = currentMonth;
       currentDate.setDate(currentDate.getDate() + 1);
@@ -392,6 +435,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private filterRelevantDates(allDates: TimelineDate[]): TimelineDate[] {
     const todayKey = this.formatDateKey(new Date());
+    const showBalanceIndicatorSetting = this.entryService.showBalanceIndicator();
     const filtered: TimelineDate[] = [];
 
     for (const current of allDates) {
@@ -412,11 +456,16 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           daysSkipped = daysDiff - 1;
         }
 
+        // Determine if balance indicator should show
+        // Show if: setting enabled AND (day has entries OR is today)
+        const showBalanceIndicator = showBalanceIndicatorSetting && (hasEntries || isToday);
+
         filtered.push({
           ...current,
           isToday,
           daysSkipped,
-          showMonthHeader: false
+          showMonthHeader: false,
+          showBalanceIndicator
         });
       }
     }
