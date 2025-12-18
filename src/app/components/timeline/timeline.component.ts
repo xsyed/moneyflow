@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect, untracked } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
@@ -126,16 +128,18 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   constructor(public entryService: EntryService) {
-    // Watch for entry changes and regenerate all segments
-    effect(() => {
-      // Use untracked to prevent signal writes during effect execution
-      untracked(() => {
+    // Track changes to both entries and settings using RxJS
+    combineLatest([
+      toObservable(this.entryService.entries),
+      toObservable(this.entryService.settings)
+    ])
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
         // Only regenerate if already initialized
         if (this.initialized) {
           this.regenerateAllSegments();
         }
       });
-    });
   }
 
   ngOnInit(): void {
