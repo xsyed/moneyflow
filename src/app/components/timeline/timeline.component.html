@@ -10,7 +10,7 @@
   </button>
 
   <!-- Timeline Viewport -->
-  <div #scrollContainer class="timeline-viewport" (scroll)="onScroll($event)">
+  <div #scrollContainer class="timeline-viewport" (scroll)="onScroll()">
     <!-- Top sentinel for infinite scroll detection -->
     <div #topSentinel class="scroll-sentinel"></div>
 
@@ -33,7 +33,7 @@
            matTooltipPosition="left"
            [matTooltipShowDelay]="300"
            [matTooltipHideDelay]="0"
-           (click)="onDateRowClick(timelineDate.date, $event)">
+           (click)="onDateRowClick(timelineDate.date)">
         <!-- Date Label -->
         <div class="date-label">
           {{ timelineDate.displayDate }}

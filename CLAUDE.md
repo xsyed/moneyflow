@@ -45,3 +45,7 @@ A responsive web app for tracking recurring income and expenses on a visual time
 
 
 You can call me as "Samwise" when reply back to me.
+
+After each change, check if there are new eslint warnings or errors and fix them before proceeding. You need to fix the eslint issues as part of the implementation.
+
+When I'm asking any request or change or in plan mode, ask me any clarifying questions if needed before proceeding. Always confirm the requirements with me before starting any implementation.

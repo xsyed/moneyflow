@@ -57,16 +57,21 @@ export class EntryDialogComponent {
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: EntryDialogData | Entry | null) {
     let initialDate: Date | null = null;
 
-    // Handle both old and new data formats for backward compatibility
-    if (data && 'entry' in data) {
-      // New format: { entry, occurrenceDate, updateOption, initialDate }
-      this.entry = data.entry || null;
-      this.occurrenceDate = data.occurrenceDate || null;
-      this.updateOption = data.updateOption || null;
-      initialDate = data.initialDate || null;
-    } else {
-      // Old format: just the entry (for adding new entries)
+    // Case 1: EntryDialogData format { entry?, occurrenceDate?, updateOption?, initialDate? }
+    if (data && typeof data === 'object' && ('entry' in data || 'initialDate' in data)) {
+      const dialogData = data as EntryDialogData;
+      this.entry = dialogData.entry || null;
+      this.occurrenceDate = dialogData.occurrenceDate || null;
+      this.updateOption = dialogData.updateOption || null;
+      initialDate = dialogData.initialDate || null;
+    }
+    // Case 2: Legacy format - Entry object passed directly
+    else if (data && typeof data === 'object' && 'id' in data && 'label' in data) {
       this.entry = data as Entry;
+    }
+    // Case 3: No data or null
+    else {
+      this.entry = null;
     }
 
     // Determine if this is edit mode
@@ -149,13 +154,13 @@ export class EntryDialogComponent {
       const formValue = this.entryForm.value;
 
       // Build base entry data
-      const entryData: any = {
+      const entryData: Omit<Entry, 'id' | 'createdAt'> = {
         label: formValue.label.trim(),
         note: formValue.note?.trim() || undefined,
         amount: parseFloat(formValue.amount),
         type: formValue.type,
         repeatType: formValue.repeatType
-      };
+      } as Omit<Entry, 'id' | 'createdAt'>;
 
       // Add conditional fields based on repeat type
       if (formValue.repeatType === 'monthly') {
@@ -175,7 +180,7 @@ export class EntryDialogComponent {
         this.dialogRef.close({ action: 'added', data: entryData });
       } else if (this.updateOption === 'this-only') {
         // Scenario 2: Update this occurrence only - create a one-time entry for this specific date
-        const oneTimeEntry: any = {
+        const oneTimeEntry: Omit<Entry, 'id' | 'createdAt'> = {
           ...entryData,
           repeatType: 'once',
           specificDate: this.toUTC(this.occurrenceDate!).toISOString(),

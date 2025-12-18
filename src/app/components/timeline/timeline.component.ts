@@ -128,8 +128,6 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(public entryService: EntryService) {
     // Watch for entry changes and regenerate all segments
     effect(() => {
-      // Track entries signal - this makes the effect reactive
-      const entries = this.entryService.entries();
       // Use untracked to prevent signal writes during effect execution
       untracked(() => {
         // Only regenerate if already initialized
@@ -178,7 +176,6 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       const items = container.querySelectorAll('.timeline-item');
       if (items[index]) {
         const itemElement = items[index] as HTMLElement;
-        const containerRect = container.getBoundingClientRect();
         const itemRect = itemElement.getBoundingClientRect();
 
         // Calculate the scroll position to center the item in the viewport
@@ -193,7 +190,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onScroll(event: Event): void {
+  onScroll(): void {
     if (!this.scrollContainer) return;
 
     const container = this.scrollContainer.nativeElement;
@@ -332,7 +329,6 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Pre-fetch balanceMap for performance
     const balanceMap = this.entryService.balanceMap();
-    const todayKey = this.formatDateKey(new Date());
     const currentMonthNum = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
@@ -359,7 +355,6 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       // PRE-COMPUTE: Balance and formatted values
       const balance = balanceMap.get(dateKey) ?? this.entryService.settings()?.initialBalance ?? 0;
       const balanceFormatted = this.entryService.formatCurrency(balance);
-      const isToday = dateKey === todayKey;
       const isCurrentMonthFlag = nextDay.getMonth() === currentMonthNum && nextDay.getFullYear() === currentYear;
 
       timelineDates.push({
@@ -395,8 +390,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const todayKey = this.formatDateKey(new Date());
     const filtered: TimelineDate[] = [];
 
-    for (let i = 0; i < allDates.length; i++) {
-      const current = allDates[i];
+    for (const current of allDates) {
       const isToday = current.dateKey === todayKey;
       const hasEntries = current.entries.length > 0;
       const isMonthEnd = current.isMonthEnd;
@@ -580,7 +574,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     return item.dateKey;
   }
 
-  onDateRowClick(date: Date, event: Event): void {
+  onDateRowClick(date: Date): void {
     // Open add entry dialog with pre-filled date
     const dialogRef = this.dialog.open(EntryDialogComponent, {
       width: '500px',

@@ -103,9 +103,8 @@ export class EntryService {
     entries: Entry[],
     startDate: Date,
     endDate: Date,
-    settings?: AppSettings
-  ): Array<{ entry: Entry; date: Date }> {
-    const occurrences: Array<{ entry: Entry; date: Date }> = [];
+  ): { entry: Entry; date: Date }[] {
+    const occurrences: { entry: Entry; date: Date }[] = [];
 
     // Generate all occurrences for each entry
     for (const entry of entries) {
@@ -151,14 +150,14 @@ export class EntryService {
     endDate.setMonth(endDate.getMonth() + 18); // 18 months forward
 
     // Generate all occurrences with cutoff settings
-    const allOccurrences = this.generateAllOccurrences(entries, startDate, endDate, settings);
+    const allOccurrences = this.generateAllOccurrences(entries, startDate, endDate);
 
     // Sort by date
     allOccurrences.sort((a, b) => a.date.getTime() - b.date.getTime());
 
     // Calculate running balance day by day
     let currentBalance = settings.initialBalance;
-    let currentDate = new Date(balanceSetDate);
+    const currentDate = new Date(balanceSetDate);
     currentDate.setHours(0, 0, 0, 0);
 
     // Initialize balance at balanceSetDate

@@ -32,7 +32,7 @@ export function generateOccurrences(
       return occurrences;
     }
 
-    let currentDate = new Date(effectiveStartDate);
+    const currentDate = new Date(effectiveStartDate);
     currentDate.setDate(1);
 
     while (currentDate <= endDate) {
@@ -54,7 +54,7 @@ export function generateOccurrences(
     const entryStartDate = fromUTC(new Date(entry.startDate));
     const intervalDays = entry.repeatType === 'weekly' ? 7 : 14;
 
-    let currentDate = new Date(entryStartDate);
+    const currentDate = new Date(entryStartDate);
 
     // Skip forward to first occurrence >= effectiveStartDate
     while (currentDate < effectiveStartDate) {
@@ -100,7 +100,7 @@ export function getNextOccurrence(entry: Entry, fromDate: Date): Date {
     const entryStartDate = fromUTC(new Date(entry.startDate));
     const intervalDays = entry.repeatType === 'weekly' ? 7 : 14;
 
-    let nextDate = new Date(entryStartDate);
+    const nextDate = new Date(entryStartDate);
 
     while (nextDate <= fromDate) {
       nextDate.setDate(nextDate.getDate() + intervalDays);
