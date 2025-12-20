@@ -55,6 +55,27 @@
       <p class="option-hint">Display running balance after each day's entries</p>
     </div>
 
+    <!-- Data Management Section -->
+    <div class="data-management">
+      <h4 class="section-title">Data Management</h4>
+
+      <div class="action-buttons">
+        <button mat-stroked-button (click)="onExport()" type="button">
+          <mat-icon>download</mat-icon>
+          Export Data
+        </button>
+
+        <button mat-stroked-button (click)="onImport()" type="button">
+          <mat-icon>upload</mat-icon>
+          Import Data
+        </button>
+      </div>
+
+      <p class="section-hint">
+        Export your data to backup, or import to restore from a previous backup.
+      </p>
+    </div>
+
   </form>
 </mat-dialog-content>
 

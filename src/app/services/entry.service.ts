@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Entry, AppSettings } from '../models/entry.model';
-import { StorageService } from './storage.service';
+import { StorageService, ExportData } from './storage.service';
 import { generateOccurrences } from '../utils/date.utils';
 
 @Injectable({
@@ -227,5 +227,14 @@ export class EntryService {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+  }
+
+  exportData(): ExportData {
+    return this.storageService.exportData();
+  }
+
+  importData(data: ExportData): void {
+    this.storageService.importData(data);
+    this.loadFromStorage();
   }
 }
