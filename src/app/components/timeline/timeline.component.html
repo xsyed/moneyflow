@@ -52,6 +52,8 @@
                  class="entry-item"
                  [class.income]="occurrence.entry.type === 'income'"
                  [class.expense]="occurrence.entry.type === 'expense'"
+                 [class.light-text]="occurrence.entry.color && isDarkColor(occurrence.entry.color)"
+                 [style.background-color]="occurrence.entry.color || '#fafafa'"
                  (click)="onEntryClick(occurrence.entry, occurrence.date, $event)">
 
               <div class="entry-content">

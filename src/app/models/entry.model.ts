@@ -1,6 +1,14 @@
 export type RepeatType = 'monthly' | 'weekly' | 'biweekly' | 'once';
 export type EntryType = 'income' | 'expense';
 
+export const ENTRY_COLORS = [
+  '#fafafa',  // Light gray (default)
+  '#00A5E3',  // Blue
+  '#8DD7BF',  // Teal/Mint
+  '#FFBF65',  // Orange/Peach
+  '#FF96C5'   // Pink
+] as const;
+
 export interface Entry {
   id: string;
   label: string;
@@ -14,6 +22,7 @@ export interface Entry {
   createdAt: string;        // ISO UTC string
   parentEntryId?: string;   // If this is a one-time override, reference to parent recurring entry
   isDeleted?: boolean;      // Marks this as a deletion marker for recurring entry
+  color?: string;           // Hex color code for entry background
 }
 
 export interface AppSettings {

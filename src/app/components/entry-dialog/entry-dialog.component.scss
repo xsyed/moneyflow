@@ -34,6 +34,32 @@
   }
 }
 
+.color-picker {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.color-option {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  &.selected {
+    border-color: #1976d2;
+    border-width: 3px;
+    transform: scale(1.15);
+  }
+}
+
 mat-dialog-content {
   overflow-y: auto;
   max-height: 70vh;

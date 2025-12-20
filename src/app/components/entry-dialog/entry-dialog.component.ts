@@ -10,7 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { EntryService } from '../../services/entry.service';
-import { RepeatType, EntryType, Entry } from '../../models/entry.model';
+import { RepeatType, EntryType, Entry, ENTRY_COLORS } from '../../models/entry.model';
 import { UpdateOption } from '../update-options-dialog/update-options-dialog.component';
 import { fromUTC } from '../../utils/date.utils';
 
@@ -47,12 +47,16 @@ export class EntryDialogComponent {
   entryForm: FormGroup;
   repeatType = signal<RepeatType>('monthly');
   isEditMode = signal<boolean>(false);
+  selectedColor = signal<string>(ENTRY_COLORS[0]);
   entry: Entry | null = null;
   occurrenceDate: Date | null = null;
   updateOption: UpdateOption | null = null;
 
   // Days 1-31 for monthly selection
   days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  // Color options for template
+  entryColors = ENTRY_COLORS;
 
   constructor(@Optional() @Inject(MAT_DIALOG_DATA) public data: EntryDialogData | Entry | null) {
     let initialDate: Date | null = null;
@@ -89,8 +93,14 @@ export class EntryDialogComponent {
       repeatType: [this.entry?.repeatType || 'monthly' as RepeatType, Validators.required],
       dayOfMonth: [this.entry?.dayOfMonth || defaultDayOfMonth, [Validators.required, Validators.min(1), Validators.max(31)]],
       startDate: [this.entry?.startDate ? fromUTC(new Date(this.entry.startDate)) : defaultStartDate],
-      specificDate: [this.entry?.specificDate ? fromUTC(new Date(this.entry.specificDate)) : defaultStartDate]
+      specificDate: [this.entry?.specificDate ? fromUTC(new Date(this.entry.specificDate)) : defaultStartDate],
+      color: [this.entry?.color || ENTRY_COLORS[0]]
     });
+
+    // Set initial color from data
+    if (this.entry?.color) {
+      this.selectedColor.set(this.entry.color);
+    }
 
     // Set initial repeat type from data
     if (this.entry?.repeatType) {
@@ -159,7 +169,8 @@ export class EntryDialogComponent {
         note: formValue.note?.trim() || undefined,
         amount: parseFloat(formValue.amount),
         type: formValue.type,
-        repeatType: formValue.repeatType
+        repeatType: formValue.repeatType,
+        color: formValue.color
       } as Omit<Entry, 'id' | 'createdAt'>;
 
       // Add conditional fields based on repeat type
@@ -216,5 +227,10 @@ export class EntryDialogComponent {
 
   get isFormValid(): boolean {
     return this.entryForm.valid;
+  }
+
+  onColorSelect(color: string): void {
+    this.selectedColor.set(color);
+    this.entryForm.get('color')?.setValue(color);
   }
 }

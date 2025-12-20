@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { EntryService } from '../../services/entry.service';
 import { Entry } from '../../models/entry.model';
 import { generateOccurrences } from '../../utils/date.utils';
+import { isDarkColor } from '../../utils/color.utils';
 import { EntryActionsSheetComponent, EntryAction } from '../entry-actions-sheet/entry-actions-sheet.component';
 import { EntryDialogComponent } from '../entry-dialog/entry-dialog.component';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
@@ -786,5 +787,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   getBalanceTooltipClass(date: Date): string {
     const balance = this.entryService.getBalanceForDate(date);
     return balance >= 0 ? 'positive-balance' : 'negative-balance';
+  }
+
+  isDarkColor(hexColor: string): boolean {
+    return isDarkColor(hexColor);
   }
 }

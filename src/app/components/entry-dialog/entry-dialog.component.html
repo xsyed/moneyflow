@@ -37,11 +37,27 @@
 
     <!-- Type Toggle -->
     <div class="form-field-wrapper">
-      <label class="field-label">Type</label>
+      <span class="field-label">Type</span>
       <mat-button-toggle-group formControlName="type" class="full-width">
         <mat-button-toggle value="income">Income</mat-button-toggle>
         <mat-button-toggle value="expense">Expense</mat-button-toggle>
       </mat-button-toggle-group>
+    </div>
+
+    <!-- Color Picker -->
+    <div class="form-field-wrapper">
+      <span class="field-label">Color</span>
+      <div class="color-picker">
+        <button
+          *ngFor="let color of entryColors"
+          type="button"
+          class="color-option"
+          [class.selected]="selectedColor() === color"
+          [style.background-color]="color"
+          (click)="onColorSelect(color)"
+          [attr.aria-label]="'Select color ' + color">
+        </button>
+      </div>
     </div>
 
     <!-- Repeat Type Select -->
