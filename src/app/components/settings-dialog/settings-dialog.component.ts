@@ -51,7 +51,8 @@ export class SettingsDialogComponent {
         Validators.required
       ],
       showDaysIndicator: [currentSettings?.showDaysIndicator ?? false],
-      showBalanceIndicator: [currentSettings?.showBalanceIndicator ?? false]
+      showBalanceIndicator: [currentSettings?.showBalanceIndicator ?? false],
+      showWeekday: [currentSettings?.showWeekday ?? false]
     });
 
     // Track changes to enable/disable save button
@@ -73,7 +74,8 @@ export class SettingsDialogComponent {
         initialBalance: parseFloat(formValue.initialBalance),
         balanceSetDate: this.toUTC(formValue.balanceSetDate).toISOString(),
         showDaysIndicator: formValue.showDaysIndicator,
-        showBalanceIndicator: formValue.showBalanceIndicator
+        showBalanceIndicator: formValue.showBalanceIndicator,
+        showWeekday: formValue.showWeekday
       };
 
       // Update via service method

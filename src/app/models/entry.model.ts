@@ -30,4 +30,5 @@ export interface AppSettings {
   balanceSetDate: string;   // Date from which balance calculations start
   showDaysIndicator?: boolean;    // Toggle for "X days" skip indicator (default: false)
   showBalanceIndicator?: boolean; // Toggle for balance indicator (default: false)
+  showWeekday?: boolean;          // Toggle for weekday labels (Mon, Tue, etc.) above dates (default: false)
 }

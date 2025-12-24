@@ -14,6 +14,13 @@
     <!-- Top sentinel for infinite scroll detection -->
     <div #topSentinel class="scroll-sentinel"></div>
 
+    <!-- Global Empty State -->
+    <div *ngIf="!hasAnyEntries()" class="global-empty-state">
+      <mat-icon class="empty-icon">calendar_today</mat-icon>
+      <p class="empty-message">No entries yet.</p>
+      <p class="empty-hint">Tap + to add your first income or expense.</p>
+    </div>
+
     <div *ngFor="let timelineDate of timelineDates(); trackBy: trackByDateKey"
          class="timeline-item">
 
@@ -36,7 +43,9 @@
            (click)="onDateRowClick(timelineDate.date)">
         <!-- Date Label -->
         <div class="date-label">
-          {{ timelineDate.displayDate }}
+          <span *ngIf="showWeekday()" class="date-weekday">{{ timelineDate.displayDate.weekday }}</span>
+          <span class="date-day">{{ timelineDate.displayDate.day }}</span>
+          <span class="date-month">{{ timelineDate.displayDate.month }}</span>
         </div>
 
         <!-- Connector Column -->

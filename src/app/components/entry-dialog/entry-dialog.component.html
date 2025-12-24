@@ -52,6 +52,7 @@
           *ngFor="let color of entryColors"
           type="button"
           class="color-option"
+          [class.white]="color === entryColors[0] && selectedColor() !== color"
           [class.selected]="selectedColor() === color"
           [style.background-color]="color"
           (click)="onColorSelect(color)"

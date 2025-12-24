@@ -58,6 +58,10 @@
     border-width: 3px;
     transform: scale(1.15);
   }
+  &.white {
+    border-color: #dddddd;
+    border-width: 2px;
+  }
 }
 
 mat-dialog-content {

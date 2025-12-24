@@ -31,3 +31,8 @@ main {
   font-size: 14px !important;
   font-weight: 600 !important;
 }
+
+// Material Dialog button spacing
+mat-dialog-actions {
+  gap: 8px !important;
+}

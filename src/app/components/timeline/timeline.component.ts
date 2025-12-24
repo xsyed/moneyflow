@@ -23,7 +23,7 @@ import { UpdateOptionsDialogComponent, UpdateOption } from '../update-options-di
 interface TimelineDate {
   date: Date;
   dateKey: string; // YYYY-MM-DD for comparison
-  displayDate: string; // "10 Dec"
+  displayDate: { day: string; month: string; weekday: string }; // Formatted date parts
   isMonthStart: boolean;
   isMonthEnd: boolean;
   monthYear: string; // "December 2024" for headers
@@ -110,6 +110,12 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     return dates.findIndex(d => d.dateKey === todayKey);
   });
 
+  // Check if there are any entries in the entire timeline
+  hasAnyEntries = computed(() => {
+    const dates = this.timelineDates();
+    return dates.some(d => d.entries.length > 0);
+  });
+
   // Track the current visible date range
   private currentVisibleIndex = signal<number>(0);
 
@@ -130,6 +136,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const monthsDifference = Math.abs(visibleIndex - todayIdx);
     return monthsDifference > 1;
   });
+
+  // Show weekday labels based on user setting
+  showWeekday = computed(() => this.entryService.showWeekday());
 
   private bottomSheet = inject(MatBottomSheet);
   private dialog = inject(MatDialog);
@@ -549,10 +558,11 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${year}-${month}-${day}`;
   }
 
-  private formatDisplayDate(date: Date): string {
-    const day = date.getDate();
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    return `${day} ${month}`;
+  private formatDisplayDate(date: Date): { day: string; month: string; weekday: string } {
+    const day = date.getDate().toString();
+    const month = date.toLocaleDateString('en-US', { month: 'short' }).toLowerCase();
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+    return { day, month, weekday };
   }
 
   private formatMonthYear(date: Date): string {

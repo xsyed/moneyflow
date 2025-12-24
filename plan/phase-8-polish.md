@@ -7,6 +7,21 @@ Final UI refinements, ensure responsive design, and overall polish.
 
 1. There is problem with modal styling basically for delete modal the actions button spacing is off. Also for the Single occurence edit modal has the same problem. Fix it.
 
+2. Let's also refine the date styling in the timeline list. I want the date number to be bold and the month to be in lowercase. Something like this with bold and bigger date number and month below it in the center.
+    1 
+   Dec
+
+3. Let's also add new toggle in the setting modal. This for checkbox toggle which show weekday
+The placement for it will be above the Date number
+Example:
+   Mon
+    1 
+   Dec
+
+example: Mon, Tue, Wed, Thu, Fri, Sat, Sun 
+By default it will be disabled and not show the weekday
+
+
 ### 8.1 Responsive Layout
 Test and adjust for:
 - Mobile (320px - 480px)
@@ -43,25 +58,6 @@ When no entries exist:
 - "No entries yet. Tap + to add your first income or expense."
 - Centered in timeline area
 
-### 8.6 Accessibility
-- Proper ARIA labels
-- Keyboard navigation for timeline
-- Focus management in dialogs
-- Color contrast compliance
-
-### 8.7 Final Testing
-Manual testing checklist:
-- [ ] Add entry (all repeat types)
-- [ ] Edit entry
-- [ ] Delete entry
-- [ ] Scroll past/future
-- [ ] Hover balance display
-- [ ] Current balance accuracy
-- [ ] Initial balance setup
-- [ ] LocalStorage persistence (refresh test)
-- [ ] Mobile layout
-- [ ] Tablet layout
-- [ ] Desktop layout
 
 ## Material Components Final Check
 Ensure all imports are in `app.config.ts`:
@@ -73,7 +69,3 @@ Ensure all imports are in `app.config.ts`:
 - [ ] Consistent color scheme
 - [ ] Polished timeline UI
 - [ ] Empty state handling
-- [ ] Accessibility basics
-- [ ] Manual testing complete
-
-
