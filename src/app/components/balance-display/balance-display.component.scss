@@ -17,11 +17,11 @@
   color: rgba(255, 255, 255, 0.9);
 
   &.positive {
-    color: #2e7d32;
+    color: var(--color-income-dark);
   }
 
   &.negative {
-    color: #c62828;
+    color: var(--color-expense-dark);
   }
 }
 
@@ -35,11 +35,11 @@
   color: white;
 
   &.positive {
-    color: #4caf50;
+    color: var(--color-income-light);
   }
 
   &.negative {
-    color: #f44336;
+    color: var(--color-expense-light);
   }
 }
 

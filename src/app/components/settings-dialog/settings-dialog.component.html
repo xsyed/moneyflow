@@ -60,6 +60,21 @@
       <p class="option-hint">Display day of week above dates</p>
     </div>
 
+    <!-- Appearance Section -->
+    <div class="appearance-section">
+      <h4 class="section-title">Appearance</h4>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Theme</mat-label>
+        <mat-select formControlName="themeMode">
+          <mat-option value="system">System (Auto)</mat-option>
+          <mat-option value="light">Light</mat-option>
+          <mat-option value="dark">Dark</mat-option>
+        </mat-select>
+        <mat-hint>Choose your preferred color scheme</mat-hint>
+      </mat-form-field>
+    </div>
+
     <!-- Data Management Section -->
     <div class="data-management">
       <h4 class="section-title">Data Management</h4>

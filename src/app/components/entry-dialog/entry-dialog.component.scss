@@ -22,7 +22,7 @@
   .field-label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-secondary);
   }
 
   mat-button-toggle-group {
@@ -50,16 +50,16 @@
 
   &:hover {
     transform: scale(1.1);
-    border-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--border-light);
   }
 
   &.selected {
-    border-color: #1976d2;
+    border-color: var(--color-today-accent);
     border-width: 3px;
     transform: scale(1.15);
   }
   &.white {
-    border-color: #dddddd;
+    border-color: var(--border-light);
     border-width: 2px;
   }
 }

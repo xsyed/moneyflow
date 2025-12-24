@@ -9,6 +9,7 @@ import { BalanceDisplayComponent } from './components/balance-display/balance-di
 import { InitialBalanceDialogComponent } from './components/initial-balance-dialog/initial-balance-dialog.component';
 import { SettingsDialogComponent } from './components/settings-dialog/settings-dialog.component';
 import { EntryService } from './services/entry.service';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,7 @@ export class AppComponent implements OnInit {
   title = 'Money Stream';
   private dialog = inject(MatDialog);
   private entryService = inject(EntryService);
+  private themeService = inject(ThemeService); // Initialize theme detection
 
   ngOnInit(): void {
     // Check if initial balance has been set

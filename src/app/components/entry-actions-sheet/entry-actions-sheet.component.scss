@@ -1,38 +1,38 @@
 .sheet-header {
   padding: 1.5rem 1rem 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-light);
 
   h3 {
     margin: 0 0 0.5rem;
     font-size: 18px;
     font-weight: 600;
-    color: rgba(0, 0, 0, 0.87);
+    color: var(--text-primary);
   }
 
   .entry-details {
     margin: 0;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 
     .income {
-      color: #2e7d32;
+      color: var(--color-income-dark);
       font-weight: 600;
     }
 
     .expense {
-      color: #c62828;
+      color: var(--color-expense-dark);
       font-weight: 600;
     }
 
     .separator {
-      color: rgba(0, 0, 0, 0.3);
+      color: var(--text-tertiary);
     }
 
     .repeat-info {
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--text-secondary);
     }
   }
 }
@@ -44,22 +44,22 @@ mat-nav-list {
     height: 56px;
 
     mat-icon {
-      color: rgba(0, 0, 0, 0.54);
+      color: var(--text-secondary);
     }
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: var(--bg-hover);
     }
 
     &.delete-action {
-      color: #c62828;
+      color: var(--color-expense-dark);
 
       mat-icon {
-        color: #c62828;
+        color: var(--color-expense-dark);
       }
 
       &:hover {
-        background-color: rgba(198, 40, 40, 0.04);
+        background-color: var(--bg-hover);
       }
     }
   }

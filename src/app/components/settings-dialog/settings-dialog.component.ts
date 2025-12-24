@@ -8,7 +8,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { EntryService } from '../../services/entry.service';
+import { ThemeService } from '../../services/theme.service';
 import { AppSettings } from '../../models/entry.model';
 import { ExportData } from '../../services/storage.service';
 
@@ -24,7 +26,8 @@ import { ExportData } from '../../services/storage.service';
     MatDatepickerModule,
     MatButtonModule,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
+    MatSelectModule
   ],
   templateUrl: './settings-dialog.component.html',
   styleUrl: './settings-dialog.component.scss'
@@ -34,6 +37,7 @@ export class SettingsDialogComponent {
   private dialog = inject(MatDialog);
   private dialogRef = inject(MatDialogRef<SettingsDialogComponent>);
   private entryService = inject(EntryService);
+  private themeService = inject(ThemeService);
 
   settingsForm: FormGroup;
   hasChanges = signal<boolean>(false);
@@ -52,7 +56,8 @@ export class SettingsDialogComponent {
       ],
       showDaysIndicator: [currentSettings?.showDaysIndicator ?? false],
       showBalanceIndicator: [currentSettings?.showBalanceIndicator ?? false],
-      showWeekday: [currentSettings?.showWeekday ?? false]
+      showWeekday: [currentSettings?.showWeekday ?? false],
+      themeMode: [currentSettings?.themeMode ?? 'system']
     });
 
     // Track changes to enable/disable save button
@@ -75,11 +80,16 @@ export class SettingsDialogComponent {
         balanceSetDate: this.toUTC(formValue.balanceSetDate).toISOString(),
         showDaysIndicator: formValue.showDaysIndicator,
         showBalanceIndicator: formValue.showBalanceIndicator,
-        showWeekday: formValue.showWeekday
+        showWeekday: formValue.showWeekday,
+        themeMode: formValue.themeMode
       };
 
       // Update via service method
       this.entryService.updateSettings(newSettings);
+
+      // Update theme service
+      this.themeService.setThemeMode(formValue.themeMode);
+
       this.dialogRef.close(true);
     }
   }
