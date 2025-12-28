@@ -520,10 +520,11 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       // For recurring entries, check if deleted
       if (occurrence.entry.repeatType !== 'once') {
         // Check for deletion marker
+        // Use substring(0,10) to extract YYYY-MM-DD directly from ISO string to avoid timezone issues
         const hasDeleteMarker = entries.some(
           e => e.isDeleted === true &&
                e.parentEntryId === occurrence.entry.id &&
-               e.specificDate === dateKey
+               e.specificDate?.substring(0, 10) === dateKey
         );
         if (hasDeleteMarker) return false;
 
@@ -775,6 +776,15 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(confirmed => {
       if (confirmed) {
+        // If this is an override entry (has parentEntryId), also create a deletion marker
+        // for the parent recurring entry to prevent it from showing through
+        if (entry.parentEntryId && entry.specificDate) {
+          this.entryService.deleteSingleOccurrence(
+            entry.parentEntryId,
+            new Date(entry.specificDate)
+          );
+        }
+
         this.entryService.deleteEntry(entry.id);
 
         // Regenerate timeline after deleting entry

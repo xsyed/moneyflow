@@ -121,13 +121,32 @@ export class EntryService {
       }
     }
 
-    // Filter out recurring entries that have one-time overrides (parentEntryId logic)
+    // Filter out deletion markers and recurring entries that have overrides/deletions
     return occurrences.filter(occurrence => {
+      // Exclude deletion markers themselves from the results
+      if (occurrence.entry.isDeleted) {
+        return false;
+      }
+
+      // For recurring entries, check if deleted or overridden
       if (occurrence.entry.repeatType !== 'once') {
         const dateKey = this.formatDateKey(occurrence.date);
+
+        // Check for deletion marker
+        // Use substring(0,10) to extract YYYY-MM-DD directly from ISO string to avoid timezone issues
+        const hasDeleteMarker = occurrences.some(
+          other =>
+            other.entry.isDeleted === true &&
+            other.entry.parentEntryId === occurrence.entry.id &&
+            other.entry.specificDate?.substring(0, 10) === dateKey
+        );
+        if (hasDeleteMarker) return false;
+
+        // Check for content override
         const hasOverride = occurrences.some(
           other =>
             other.entry.repeatType === 'once' &&
+            !other.entry.isDeleted &&
             other.entry.parentEntryId === occurrence.entry.id &&
             this.formatDateKey(other.date) === dateKey
         );
