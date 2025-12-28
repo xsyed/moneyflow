@@ -11,9 +11,10 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EntryService } from '../../services/entry.service';
+import { ThemeService } from '../../services/theme.service';
 import { Entry } from '../../models/entry.model';
 import { generateOccurrences } from '../../utils/date.utils';
-import { isDarkColor } from '../../utils/color.utils';
+import { isDarkColor, getDarkModeColor } from '../../utils/color.utils';
 import { EntryActionsSheetComponent, EntryAction } from '../entry-actions-sheet/entry-actions-sheet.component';
 import { EntryDialogComponent } from '../entry-dialog/entry-dialog.component';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
@@ -145,7 +146,10 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
 
-  constructor(public entryService: EntryService) {
+  constructor(
+    public entryService: EntryService,
+    public themeService: ThemeService
+  ) {
     // Track changes to both entries and settings using RxJS
     combineLatest([
       toObservable(this.entryService.entries),
@@ -811,5 +815,20 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isDarkColor(hexColor: string): boolean {
     return isDarkColor(hexColor);
+  }
+
+  /**
+   * Get the appropriate background color for an entry based on theme
+   * In dark mode, returns a darkened equivalent; in light mode, returns original
+   */
+  getEntryBackgroundColor(color: string | undefined): string {
+    const baseColor = color || '#fafafa';
+
+    // If in dark mode, transform to dark equivalent
+    if (this.themeService.isDarkMode()) {
+      return getDarkModeColor(baseColor);
+    }
+
+    return baseColor;
   }
 }

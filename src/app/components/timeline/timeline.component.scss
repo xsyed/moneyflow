@@ -195,8 +195,25 @@
     }
   }
 
+  // Dark text for darkened backgrounds in dark mode
+  &.dark-text {
+    .entry-label {
+      color: #2a2a2a;  // Dark charcoal
+      font-weight: 500;
+    }
+
+    .entry-note {
+      color: rgba(42, 42, 42, 0.8);  // Slightly lighter charcoal
+    }
+
+    .entry-amount {
+      color: #2a2a2a;  // Dark charcoal
+      font-weight: 600;
+    }
+  }
+
   // Amount colors for light backgrounds only
-  &:not(.light-text) {
+  &:not(.light-text):not(.dark-text) {
     &.income .entry-amount {
       color: var(--color-income-dark);
       font-weight: 600;
@@ -209,6 +226,10 @@
   }
 }
 
+// Dark mode specific styles - add border in dark mode
+:host-context(html.dark-theme) .entry-item {
+  border: 1px solid #404040;  // Neutral gray border
+}
 
 .entry-content {
   flex: 1;

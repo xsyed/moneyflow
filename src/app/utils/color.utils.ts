@@ -19,3 +19,32 @@ export function isDarkColor(hexColor: string): boolean {
   // If luminance < 0.5, it's a dark color
   return luminance < 0.5;
 }
+
+/**
+ * Color mapping for dark mode
+ * Maps light entry colors to their darker equivalents for dark mode
+ */
+const DARK_MODE_COLOR_MAP: Record<string, string> = {
+  '#fafafa': '#808080',   // Light gray → Medium gray
+  '#00A5E3': '#005A8A',   // Blue → Dark blue
+  '#8DD7BF': '#2E6E55',   // Teal → Dark teal
+  '#FFBF65': '#996B29',   // Orange → Dark orange
+  '#FF96C5': '#994A6B'    // Pink → Dark pink
+};
+
+/**
+ * Get the dark mode equivalent of a color
+ * @param hexColor - Light mode hex color (with or without #)
+ * @returns Dark mode hex color if mapping exists, otherwise original color
+ */
+export function getDarkModeColor(hexColor: string): string {
+  // Normalize color format
+  const normalized = (hexColor.startsWith('#') ? hexColor : `#${hexColor}`).toUpperCase();
+
+  // Find mapped color (case-insensitive)
+  const mappedColor = Object.entries(DARK_MODE_COLOR_MAP).find(
+    ([light]) => light.toUpperCase() === normalized
+  );
+
+  return mappedColor ? mappedColor[1] : hexColor;
+}
