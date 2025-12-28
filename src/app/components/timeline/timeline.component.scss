@@ -489,22 +489,26 @@
     margin: 0 8px;
   }
 
+  .entries-list {
+    gap: 12px;
+  }
+
   .entry-item {
-    padding: 6px 10px;
-    gap: 8px;
+    padding: 14px 18px;
+    gap: 12px;
   }
 
   .entry-label {
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .entry-note {
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .entry-amount {
     font-size: 14px;
-    min-width: 80px;
+    min-width: 85px;
   }
 
   .today-button {
@@ -554,32 +558,32 @@
 // Small mobile screens
 @media (max-width: 480px) {
   .date-label {
-    min-width: 55px;
+    min-width: 40px;
   }
 
   .date-day {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .date-month {
-    font-size: 12px;
-  }
-
-  .date-weekday {
-    font-size: 9px;
-  }
-
-  .entry-label {
-    font-size: 12px;
-  }
-
-  .entry-note {
     font-size: 10px;
   }
 
+  .date-weekday {
+    font-size: 8px;
+  }
+
+  .entry-label {
+    font-size: 16px;
+  }
+
+  .entry-note {
+    font-size: 14px;
+  }
+
   .entry-amount {
-    font-size: 13px;
-    min-width: 70px;
+    font-size: 15px;
+    min-width: 85px;
   }
 
   .month-header {
