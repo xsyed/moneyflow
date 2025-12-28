@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ElementRef, signal, computed, inject, ChangeDetectionStrategy, ChangeDetectorRef, Output, EventEmitter, HostListener } from '@angular/core';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -82,6 +82,12 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('topSentinel') topSentinel!: ElementRef<HTMLDivElement>;
   @ViewChild('bottomSentinel') bottomSentinel!: ElementRef<HTMLDivElement>;
 
+  // Output event for scroll direction (used by mobile bottom bar)
+  @Output() scrollDirectionChange = new EventEmitter<'up' | 'down'>();
+
+  // Track last scroll position for direction detection
+  private lastScrollTop = 0;
+
   // IntersectionObserver for infinite scroll
   private topObserver?: IntersectionObserver;
   private bottomObserver?: IntersectionObserver;
@@ -120,8 +126,14 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   // Track the current visible date range
   private currentVisibleIndex = signal<number>(0);
 
-  // Mobile detection for performance optimizations
+  // Mobile detection for performance optimizations and UI visibility
   isMobile = signal<boolean>(false);
+
+  // Handle window resize for mobile detection
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.isMobile.set(window.innerWidth <= 768);
+  }
 
   // Flag to track initialization (plain boolean to avoid signal tracking in effect)
   private initialized = false;
@@ -220,6 +232,17 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.scrollContainer) return;
 
     const container = this.scrollContainer.nativeElement;
+    const currentScrollTop = container.scrollTop;
+
+    // Detect scroll direction with threshold to avoid jitter
+    const scrollThreshold = 10;
+    if (Math.abs(currentScrollTop - this.lastScrollTop) > scrollThreshold) {
+      // Scrolling down in container = moving to future dates = emit 'down' (hide bar)
+      // Scrolling up in container = moving to past dates = emit 'up' (show bar)
+      this.scrollDirectionChange.emit(currentScrollTop > this.lastScrollTop ? 'down' : 'up');
+      this.lastScrollTop = currentScrollTop;
+    }
+
     const items = container.querySelectorAll('.timeline-item');
 
     // Find the first visible item to update current visible index

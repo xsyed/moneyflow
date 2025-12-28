@@ -41,6 +41,15 @@
   // Shadow
   --shadow-light: rgba(0, 0, 0, 0.1);
   --shadow-medium: rgba(0, 0, 0, 0.2);
+
+  // Bottom Navigation Bar
+  --bottom-bar-bg: #ffffff;
+  --bottom-bar-shadow: rgba(0, 0, 0, 0.1);
+  --bottom-bar-border: rgba(0, 0, 0, 0.05);
+
+  // FAB accent color (pink/magenta)
+  --fab-accent: #e91e63;
+  --fab-accent-hover: #c2185b;
 }
 
 // Define CSS custom properties for dark mode
@@ -81,6 +90,15 @@ html.dark-theme {
   // Shadow
   --shadow-light: rgba(0, 0, 0, 0.3);
   --shadow-medium: rgba(0, 0, 0, 0.5);
+
+  // Bottom Navigation Bar
+  --bottom-bar-bg: #2a2a2a;
+  --bottom-bar-shadow: rgba(0, 0, 0, 0.4);
+  --bottom-bar-border: rgba(255, 255, 255, 0.05);
+
+  // FAB accent color (pink/magenta - brighter for dark mode)
+  --fab-accent: #f06292;
+  --fab-accent-hover: #e91e63;
 }
 
 html, body {

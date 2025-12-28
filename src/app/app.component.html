@@ -1,4 +1,5 @@
-<mat-toolbar color="primary">
+<!-- Top Toolbar (desktop only) -->
+<mat-toolbar *ngIf="!showMobileLayout()" color="primary">
   <span style="line-height: 2;">{{ title }}</span>
   <span class="spacer"></span>
   <app-balance-display></app-balance-display>
@@ -10,12 +11,13 @@
   </button>
 </mat-toolbar>
 
-<main>
-  <app-timeline></app-timeline>
+<main [class.mobile-layout]="showMobileLayout()">
+  <app-timeline (scrollDirectionChange)="onScrollDirection($event)"></app-timeline>
 </main>
 
-<!-- Floating Action Button -->
+<!-- Desktop Floating Action Button -->
 <button
+  *ngIf="!showMobileLayout()"
   mat-fab
   color="primary"
   class="fab-button"
@@ -23,3 +25,36 @@
   aria-label="Add new entry">
   <mat-icon>add</mat-icon>
 </button>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav
+  *ngIf="showMobileLayout()"
+  class="mobile-bottom-bar"
+  [class.hidden]="!isBottomBarVisible()">
+
+  <!-- Left: Balance Display -->
+  <div class="bottom-bar-left">
+    <app-balance-display></app-balance-display>
+  </div>
+
+  <!-- Center: Elevated FAB -->
+  <div class="bottom-bar-center">
+    <button
+      mat-fab
+      class="center-fab"
+      (click)="openAddEntryDialog()"
+      aria-label="Add new entry">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <!-- Right: Settings -->
+  <div class="bottom-bar-right">
+    <button
+      mat-icon-button
+      (click)="openSettingsDialog()"
+      aria-label="Open settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </div>
+</nav>

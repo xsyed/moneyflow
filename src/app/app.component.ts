@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +16,7 @@ import { ThemeService } from './services/theme.service';
   selector: 'app-root',
   standalone: true,
   imports: [
+    CommonModule,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
@@ -23,7 +25,8 @@ import { ThemeService } from './services/theme.service';
     BalanceDisplayComponent
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   title = 'Money Stream';
@@ -31,7 +34,36 @@ export class AppComponent implements OnInit {
   private entryService = inject(EntryService);
   private themeService = inject(ThemeService); // Initialize theme detection
 
+  // Mobile detection signals
+  isMobile = signal<boolean>(false);
+  isBottomBarVisible = signal<boolean>(true);
+  showMobileLayout = computed(() => this.isMobile());
+
+  // Handle window resize for mobile breakpoint detection
+  @HostListener('window:resize')
+  onResize(): void {
+    this.checkMobileBreakpoint();
+  }
+
+  private checkMobileBreakpoint(): void {
+    const wasMobile = this.isMobile();
+    this.isMobile.set(window.innerWidth <= 768);
+    // Reset bottom bar visibility when switching to mobile
+    if (!wasMobile && this.isMobile()) {
+      this.isBottomBarVisible.set(true);
+    }
+  }
+
+  // Handle scroll direction from timeline component
+  onScrollDirection(direction: 'up' | 'down'): void {
+    if (!this.isMobile()) return;
+    // Hide when scrolling down (toward future), show when scrolling up (toward past)
+    this.isBottomBarVisible.set(direction === 'up');
+  }
+
   ngOnInit(): void {
+    // Check initial viewport size
+    this.checkMobileBreakpoint();
     // Check if initial balance has been set
     if (!this.entryService.hasInitialBalance()) {
       this.openInitialBalanceDialog();

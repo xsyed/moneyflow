@@ -1,7 +1,7 @@
 <div class="timeline-container">
-  <!-- Scroll to Today Button (only show when more than 1 month away) -->
+  <!-- Scroll to Today Button (only show on desktop when more than 1 month away) -->
   <button
-    *ngIf="showScrollToToday()"
+    *ngIf="showScrollToToday() && !isMobile()"
     mat-fab
     class="today-button"
     (click)="scrollToToday()"

@@ -43,18 +43,60 @@
   }
 }
 
+// Desktop toolbar mobile styles (hide icon in toolbar)
 @media (max-width: 768px) {
-  .balance-icon {
-    display: none;
-  }
+  // Only hide icon when NOT in bottom bar
+  :host:not(:host-context(.bottom-bar-left)) {
+    .balance-icon {
+      display: none;
+    }
 
-  .balance-amount {
-    font-size: 16px;
+    .balance-amount {
+      font-size: 16px;
+    }
   }
 }
 
 @media (max-width: 480px) {
+  :host:not(:host-context(.bottom-bar-left)) {
+    .balance-amount {
+      font-size: 14px;
+    }
+  }
+}
+
+// Bottom bar context - override styles for bottom navigation
+:host-context(.bottom-bar-left) {
+  .balance-inline {
+    padding: 0 8px;
+  }
+
+  .balance-icon {
+    display: flex;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-secondary);
+
+    &.positive {
+      color: var(--color-income-dark);
+    }
+
+    &.negative {
+      color: var(--color-expense-dark);
+    }
+  }
+
   .balance-amount {
-    font-size: 14px;
+    font-size: 16px;
+    color: var(--text-primary);
+
+    &.positive {
+      color: var(--color-income-dark);
+    }
+
+    &.negative {
+      color: var(--color-expense-dark);
+    }
   }
 }
