@@ -28,7 +28,9 @@
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .scroll-sentinel {
@@ -167,7 +169,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
     @media (max-width: 768px) {
-      box-shadow: none;  // Remove box-shadow on mobile for better performance
+      box-shadow: none; // Remove box-shadow on mobile for better performance
     }
   }
 
@@ -198,16 +200,16 @@
   // Dark text for darkened backgrounds in dark mode
   &.dark-text {
     .entry-label {
-      color: #2a2a2a;  // Dark charcoal
+      color: #2a2a2a; // Dark charcoal
       font-weight: 500;
     }
 
     .entry-note {
-      color: rgba(42, 42, 42, 0.8);  // Slightly lighter charcoal
+      color: rgba(42, 42, 42, 0.8); // Slightly lighter charcoal
     }
 
     .entry-amount {
-      color: #2a2a2a;  // Dark charcoal
+      color: #2a2a2a; // Dark charcoal
       font-weight: 600;
     }
   }
@@ -228,7 +230,7 @@
 
 // Dark mode specific styles - add border in dark mode
 :host-context(html.dark-theme) .entry-item {
-  border: 1px solid #404040;  // Neutral gray border
+  border: 1px solid #404040; // Neutral gray border
 }
 
 .entry-content {
@@ -256,7 +258,7 @@
   font-weight: 600;
   min-width: 100px;
   text-align: right;
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
 }
 
 .no-entries {
@@ -273,7 +275,11 @@
 }
 
 .month-end-balance-row {
-  background: linear-gradient(to right, var(--bg-secondary), var(--bg-tertiary));
+  background: linear-gradient(
+    to right,
+    var(--bg-secondary),
+    var(--bg-tertiary)
+  );
   border-top: 2px solid var(--border-light);
   border-bottom: 2px solid var(--border-light);
   padding: 16px 20px;
@@ -284,7 +290,9 @@
   margin-bottom: 16px;
 
   @media (max-width: 768px) {
-    background: var(--bg-secondary);  // Solid color on mobile for better performance
+    background: var(
+      --bg-secondary
+    ); // Solid color on mobile for better performance
   }
 }
 
@@ -299,7 +307,7 @@
 .month-end-amount {
   font-size: 20px;
   font-weight: 700;
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -394,7 +402,7 @@
   white-space: nowrap;
   font-weight: 600;
   font-size: 14px;
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
   color: var(--text-secondary);
 
   &.balance-up {
@@ -470,7 +478,7 @@
   }
 
   .date-row {
-    padding: 6px 16px;
+    padding: 6px 16px 6px 0px;
     min-height: 50px;
   }
 
@@ -491,7 +499,7 @@
   }
 
   .connector-column {
-    margin: 0 8px;
+    margin: 0;
   }
 
   .entries-list {
@@ -499,7 +507,7 @@
   }
 
   .entry-item {
-    padding: 14px 18px;
+    padding: 11px 15px;
     gap: 12px;
   }
 
