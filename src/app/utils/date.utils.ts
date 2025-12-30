@@ -7,13 +7,13 @@ export function generateOccurrences(
 ): Date[] {
   const occurrences: Date[] = [];
 
-  // For recurring entries, always limit to today or later
+  // For recurring entries, limit to creation date or later
   let effectiveStartDate = new Date(startDate);
 
   if (entry.repeatType !== 'once') {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    effectiveStartDate = new Date(Math.max(startDate.getTime(), today.getTime()));
+    // Use entry creation date as the earliest bound for recurring entries
+    const createdAt = fromUTC(new Date(entry.createdAt));
+    effectiveStartDate = new Date(Math.max(startDate.getTime(), createdAt.getTime()));
   }
 
   if (entry.repeatType === 'once') {
