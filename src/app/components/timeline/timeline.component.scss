@@ -459,6 +459,11 @@
     max-width: 100%;
   }
 
+  .timeline-viewport {
+    border-radius: 0; // Remove rounded corners for edge-to-edge look
+    box-shadow: none; // Remove shadow for flat appearance
+  }
+
   .month-header {
     padding: 10px 16px;
     font-size: 14px;

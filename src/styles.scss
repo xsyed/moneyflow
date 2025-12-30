@@ -118,6 +118,13 @@ main {
   padding: 20px;
 }
 
+// Remove padding on mobile for edge-to-edge timeline
+@media (max-width: 768px) {
+  main {
+    padding: 0;
+  }
+}
+
 // Balance tooltip custom colors
 .positive-balance {
   background-color: var(--color-income-dark) !important;
