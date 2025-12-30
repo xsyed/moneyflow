@@ -89,7 +89,8 @@ export class AppComponent implements OnInit {
     this.dialog.open(EntryDialogComponent, {
       width: '500px',
       maxWidth: '90vw',
-      disableClose: false
+      disableClose: false,
+      autoFocus: false  // Prevent auto-focusing first input field
     });
   }
 
@@ -97,7 +98,8 @@ export class AppComponent implements OnInit {
     this.dialog.open(SettingsDialogComponent, {
       width: '500px',
       maxWidth: '90vw',
-      disableClose: false
+      disableClose: false,
+      autoFocus: false  // Prevent auto-focusing first input field
     });
   }
 }

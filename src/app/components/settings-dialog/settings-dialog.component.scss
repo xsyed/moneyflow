@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem 0;
   min-width: 400px;
 
   @media (max-width: 600px) {
@@ -12,6 +11,11 @@
 
 .full-width {
   width: 100%;
+}
+
+.divider {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
 }
 
 mat-dialog-content {
@@ -34,8 +38,7 @@ mat-dialog-actions {
 }
 
 .appearance-section {
-  margin-top: 24px;
-  padding-top: 24px;
+  padding-top: 1rem;
   border-top: 1px solid var(--border-light);
 }
 
@@ -54,9 +57,6 @@ mat-dialog-actions {
 }
 
 .data-management {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-light);
 
   .section-hint {
     margin: 8px 0 0 0;

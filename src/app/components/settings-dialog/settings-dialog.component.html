@@ -3,8 +3,29 @@
 <mat-dialog-content>
   <form [formGroup]="settingsForm" class="settings-form">
 
+    <!-- Data Management Section -->
+    <div class="data-management">
+      <h4 class="section-title">Data Management</h4>
+
+      <div class="action-buttons">
+        <button mat-stroked-button (click)="onExport()" type="button">
+          <mat-icon>download</mat-icon>
+          Export Data
+        </button>
+
+        <button mat-stroked-button (click)="onImport()" type="button">
+          <mat-icon>upload</mat-icon>
+          Import Data
+        </button>
+      </div>
+
+      <p class="section-hint">
+        Export your data to backup, or import to restore from a previous backup.
+      </p>
+    </div>
+
     <!-- Initial Balance Field -->
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field appearance="outline" class="divider full-width">
       <mat-label>Initial Balance</mat-label>
       <input
         matInput
@@ -73,27 +94,6 @@
         </mat-select>
         <mat-hint>Choose your preferred color scheme</mat-hint>
       </mat-form-field>
-    </div>
-
-    <!-- Data Management Section -->
-    <div class="data-management">
-      <h4 class="section-title">Data Management</h4>
-
-      <div class="action-buttons">
-        <button mat-stroked-button (click)="onExport()" type="button">
-          <mat-icon>download</mat-icon>
-          Export Data
-        </button>
-
-        <button mat-stroked-button (click)="onImport()" type="button">
-          <mat-icon>upload</mat-icon>
-          Import Data
-        </button>
-      </div>
-
-      <p class="section-hint">
-        Export your data to backup, or import to restore from a previous backup.
-      </p>
     </div>
 
   </form>

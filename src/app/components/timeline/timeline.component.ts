@@ -671,6 +671,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(EntryDialogComponent, {
       width: '500px',
       maxWidth: '90vw',
+      autoFocus: false,  // Prevent auto-focusing first input field
       data: {
         initialDate: date
       }
@@ -733,6 +734,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogRef = this.dialog.open(EntryDialogComponent, {
       width: '500px',
       maxWidth: '90vw',
+      autoFocus: false,  // Prevent auto-focusing first input field
       data: {
         entry,
         occurrenceDate,
