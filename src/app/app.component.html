@@ -49,12 +49,12 @@
   </div>
 
   <!-- Right: Settings -->
-  <div class="bottom-bar-right">
+  <div class="bottom-bar-right" (click)="openSettingsDialog()">
     <button
       mat-icon-button
-      (click)="openSettingsDialog()"
       aria-label="Open settings">
       <mat-icon>settings</mat-icon>
     </button>
+    <span>Settings</span>
   </div>
 </nav>
