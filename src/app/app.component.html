@@ -32,9 +32,14 @@
   class="mobile-bottom-bar"
   [class.hidden]="!isBottomBarVisible()">
 
-  <!-- Left: Balance Display -->
-  <div class="bottom-bar-left">
-    <app-balance-display></app-balance-display>
+  <!-- Left: Settings -->
+  <div class="bottom-bar-right" (click)="openSettingsDialog()">
+    <button
+      mat-icon-button
+      aria-label="Open settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+    <span>Settings</span>
   </div>
 
   <!-- Center: Elevated FAB -->
@@ -48,13 +53,8 @@
     </button>
   </div>
 
-  <!-- Right: Settings -->
-  <div class="bottom-bar-right" (click)="openSettingsDialog()">
-    <button
-      mat-icon-button
-      aria-label="Open settings">
-      <mat-icon>settings</mat-icon>
-    </button>
-    <span>Settings</span>
+  <!-- Right: Balance Display -->
+  <div class="bottom-bar-left">
+    <app-balance-display></app-balance-display>
   </div>
 </nav>
