@@ -33,7 +33,7 @@
   [class.hidden]="!isBottomBarVisible()">
 
   <!-- Left: Settings -->
-  <div class="bottom-bar-right" (click)="openSettingsDialog()">
+  <div class="bottom-bar-left" (click)="openSettingsDialog()">
     <button
       mat-icon-button
       aria-label="Open settings">
@@ -54,7 +54,7 @@
   </div>
 
   <!-- Right: Balance Display -->
-  <div class="bottom-bar-left">
+  <div class="bottom-bar-right">
     <app-balance-display></app-balance-display>
   </div>
 </nav>
