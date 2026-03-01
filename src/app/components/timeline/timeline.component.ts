@@ -691,6 +691,11 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  onDateRowSpace(event: Event, date: Date): void {
+    event.preventDefault();
+    this.onDateRowClick(date);
+  }
+
   onEntryClick(entry: Entry, occurrenceDate: Date, event: Event): void {
     // Stop propagation to prevent triggering the date row click
     event.stopPropagation();
@@ -706,6 +711,11 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         this.openDeleteConfirmation(entry, occurrenceDate);
       }
     });
+  }
+
+  onEntryKeydown(entry: Entry, occurrenceDate: Date, event: Event): void {
+    event.preventDefault();
+    this.onEntryClick(entry, occurrenceDate, event);
   }
 
   private openEditDialog(entry: Entry, occurrenceDate: Date): void {

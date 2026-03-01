@@ -16,8 +16,7 @@
         placeholder="0.00"
         required
         step="0.01"
-        min="0"
-        autofocus>
+        min="0">
       <span matTextPrefix>$&nbsp;</span>
       <mat-error *ngIf="balanceForm.get('initialBalance')?.hasError('required')">
         Balance is required

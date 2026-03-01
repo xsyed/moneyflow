@@ -40,6 +40,10 @@
            matTooltipPosition="left"
            [matTooltipShowDelay]="300"
            [matTooltipHideDelay]="0"
+           role="button"
+           tabindex="0"
+           (keydown.enter)="onDateRowClick(timelineDate.date)"
+           (keydown.space)="onDateRowSpace($event, timelineDate.date)"
            (click)="onDateRowClick(timelineDate.date)">
         <!-- Date Label -->
         <div class="date-label">
@@ -64,6 +68,10 @@
                  [class.light-text]="occurrence.entry.color && !themeService.isDarkMode() && isDarkColor(occurrence.entry.color)"
                  [class.dark-text]="themeService.isDarkMode()"
                  [style.background-color]="getEntryBackgroundColor(occurrence.entry.color)"
+                 role="button"
+                 tabindex="0"
+                 (keydown.enter)="onEntryKeydown(occurrence.entry, occurrence.date, $event)"
+                 (keydown.space)="onEntryKeydown(occurrence.entry, occurrence.date, $event)"
                  (click)="onEntryClick(occurrence.entry, occurrence.date, $event)">
 
               <div class="entry-content">

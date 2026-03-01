@@ -4,6 +4,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TimelineComponent } from './components/timeline/timeline.component';
 import { EntryDialogComponent } from './components/entry-dialog/entry-dialog.component';
 import { BalanceDisplayComponent } from './components/balance-display/balance-display.component';
@@ -11,6 +12,7 @@ import { InitialBalanceDialogComponent } from './components/initial-balance-dial
 import { SettingsDialogComponent } from './components/settings-dialog/settings-dialog.component';
 import { EntryService } from './services/entry.service';
 import { ThemeService } from './services/theme.service';
+import { InstallPromptService } from './services/install-prompt.service';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +23,7 @@ import { ThemeService } from './services/theme.service';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatSnackBarModule,
     TimelineComponent,
     BalanceDisplayComponent
   ],
@@ -31,13 +34,25 @@ import { ThemeService } from './services/theme.service';
 export class AppComponent implements OnInit {
   title = 'Money Stream';
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
   private entryService = inject(EntryService);
   private themeService = inject(ThemeService); // Initialize theme detection
+  private installPromptService = inject(InstallPromptService);
 
   // Mobile detection signals
   isMobile = signal<boolean>(false);
   isBottomBarVisible = signal<boolean>(true);
   showMobileLayout = computed(() => this.isMobile());
+  showDesktopInstallAction = computed(() => {
+    return !this.showMobileLayout() && this.installPromptService.shouldShowInstallUi();
+  });
+  showMobileInstallBanner = computed(() => {
+    return this.showMobileLayout() && this.installPromptService.shouldShowInstallUi();
+  });
+  showIosInstallHint = computed(() => {
+    return this.installPromptService.isIosInstallable() && !this.installPromptService.canPromptNative();
+  });
+  installActionLabel = computed(() => this.showIosInstallHint() ? 'How to Install' : 'Install');
 
   // Handle window resize for mobile breakpoint detection
   @HostListener('window:resize')
@@ -100,6 +115,32 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       disableClose: false,
       autoFocus: false  // Prevent auto-focusing first input field
+    });
+  }
+
+  async onInstallClick(): Promise<void> {
+    if (this.showIosInstallHint()) {
+      this.openIosInstallHelp();
+      return;
+    }
+
+    const result = await this.installPromptService.promptInstall();
+    if (result === 'dismissed') {
+      this.installPromptService.dismissInstallUi();
+    } else if (result === 'unavailable') {
+      this.snackBar.open('Install is not available yet. Keep using the site and try again.', 'Close', {
+        duration: 5000
+      });
+    }
+  }
+
+  dismissInstallBanner(): void {
+    this.installPromptService.dismissInstallUi(7);
+  }
+
+  private openIosInstallHelp(): void {
+    this.snackBar.open('On Safari, tap Share and choose "Add to Home Screen".', 'Close', {
+      duration: 6000
     });
   }
 }

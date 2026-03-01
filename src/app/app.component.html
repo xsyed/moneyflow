@@ -4,7 +4,16 @@
   <span class="spacer"></span>
   <app-balance-display></app-balance-display>
   <button
+    *ngIf="showDesktopInstallAction()"
     mat-icon-button
+    type="button"
+    (click)="onInstallClick()"
+    aria-label="Install app">
+    <mat-icon>download</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    type="button"
     (click)="openSettingsDialog()"
     aria-label="Open settings">
     <mat-icon>settings</mat-icon>
@@ -26,6 +35,37 @@
   <mat-icon>add</mat-icon>
 </button>
 
+<!-- Mobile Install Banner -->
+<section
+  *ngIf="showMobileInstallBanner()"
+  class="install-banner"
+  aria-label="Install app banner">
+  <div class="install-banner-copy">
+    <strong>Install Money Stream</strong>
+    <p *ngIf="showIosInstallHint()">
+      On Safari, tap Share, then Add to Home Screen.
+    </p>
+    <p *ngIf="!showIosInstallHint()">
+      Install for quick access in a dedicated app window.
+    </p>
+  </div>
+  <div class="install-banner-actions">
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onInstallClick()">
+      {{ installActionLabel() }}
+    </button>
+    <button
+      mat-button
+      type="button"
+      (click)="dismissInstallBanner()">
+      Not now
+    </button>
+  </div>
+</section>
+
 <!-- Mobile Bottom Navigation Bar -->
 <nav
   *ngIf="showMobileLayout()"
@@ -33,9 +73,11 @@
   [class.hidden]="!isBottomBarVisible()">
 
   <!-- Left: Settings -->
-  <div class="bottom-bar-left" (click)="openSettingsDialog()">
+  <div class="bottom-bar-left">
     <button
       mat-icon-button
+      type="button"
+      (click)="openSettingsDialog()"
       aria-label="Open settings">
       <mat-icon>settings</mat-icon>
     </button>

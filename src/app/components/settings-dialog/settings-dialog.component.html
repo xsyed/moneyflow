@@ -24,6 +24,22 @@
       </p>
     </div>
 
+    <div *ngIf="canShowInstallUi()" class="install-section">
+      <h4 class="section-title">Install App</h4>
+
+      <button mat-stroked-button type="button" (click)="onInstallApp()">
+        <mat-icon>download</mat-icon>
+        {{ installButtonLabel() }}
+      </button>
+
+      <p class="section-hint" *ngIf="isIosInstallHint()">
+        On Safari: tap Share, then Add to Home Screen.
+      </p>
+      <p class="section-hint" *ngIf="!isIosInstallHint()">
+        Install Money Stream for a dedicated app window and faster access.
+      </p>
+    </div>
+
     <!-- Initial Balance Field -->
     <mat-form-field appearance="outline" class="divider full-width">
       <mat-label>Initial Balance</mat-label>
@@ -105,7 +121,7 @@
     mat-raised-button
     color="primary"
     (click)="onSave()"
-    [disabled]="!isFormValid">
+    [disabled]="!isFormValid()">
     Save
   </button>
 </mat-dialog-actions>

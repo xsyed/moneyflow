@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -13,6 +14,7 @@ import { EntryService } from '../../services/entry.service';
 import { ThemeService } from '../../services/theme.service';
 import { AppSettings } from '../../models/entry.model';
 import { ExportData } from '../../services/storage.service';
+import { InstallPromptService } from '../../services/install-prompt.service';
 
 @Component({
   selector: 'app-settings-dialog',
@@ -38,9 +40,16 @@ export class SettingsDialogComponent {
   private dialogRef = inject(MatDialogRef<SettingsDialogComponent>);
   private entryService = inject(EntryService);
   private themeService = inject(ThemeService);
+  private installPromptService = inject(InstallPromptService);
 
   settingsForm: FormGroup;
   hasChanges = signal<boolean>(false);
+  canShowInstallUi = computed(() => this.installPromptService.shouldShowInstallUi());
+  isIosInstallHint = computed(() => {
+    return this.installPromptService.isIosInstallable() && !this.installPromptService.canPromptNative();
+  });
+  installButtonLabel = computed(() => this.isIosInstallHint() ? 'How to Install' : 'Install App');
+  isFormValid = computed(() => this.settingsForm.valid && this.hasChanges());
 
   constructor() {
     const currentSettings = this.entryService.settings();
@@ -61,9 +70,11 @@ export class SettingsDialogComponent {
     });
 
     // Track changes to enable/disable save button
-    this.settingsForm.valueChanges.subscribe(() => {
-      this.hasChanges.set(this.settingsForm.dirty);
-    });
+    this.settingsForm.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.hasChanges.set(this.settingsForm.dirty);
+      });
   }
 
   onCancel(): void {
@@ -104,8 +115,18 @@ export class SettingsDialogComponent {
     ));
   }
 
-  get isFormValid(): boolean {
-    return this.settingsForm.valid && this.hasChanges();
+  async onInstallApp(): Promise<void> {
+    if (this.isIosInstallHint()) {
+      this.showErrorDialog('On Safari, tap Share and choose "Add to Home Screen".');
+      return;
+    }
+
+    const result = await this.installPromptService.promptInstall();
+    if (result === 'dismissed') {
+      this.installPromptService.dismissInstallUi();
+    } else if (result === 'unavailable') {
+      this.showErrorDialog('Install is not available yet. Keep using the site and try again.');
+    }
   }
 
   onExport(): void {
